@@ -2,24 +2,29 @@
 
 namespace App\Importers\Taxonomy;
 
-use App\Exceptions\RemoteException;
+use App\Importers\CsvObject;
 use App\Importers\ImporterInterface;
+use League\Csv\Reader;
 
-use Exception;
-
-const REMOTE_FILE = 'https://raw.githubusercontent.com/JobtechSwe/taxonomy-dump/master/taxonomy.cv';
+const REMOTE_FILE = 'https://raw.githubusercontent.com/JobtechSwe/taxonomy-dump/master/taxonomy.csv';
+const DELIMITER = '|';
 
 class FileImporter implements ImporterInterface
 {
     public function __invoke()
     {
-        $this->fetchFile();
+        $this->run();
     }
 
-    private function fetchFile()
+    public function run()
     {
-        $fileContent = file_get_contents(REMOTE_FILE);
+        return $this->getCsv(REMOTE_FILE, DELIMITER);
+    }
 
-        return $fileContent;
+    public function getCsv($url, $delimiter): CsvObject
+    {
+        $content = file_get_contents($url);
+        $csv = Reader::createFromString($content)->setDelimiter($delimiter)->setHeaderOffset(0);
+        return new CsvObject($csv);
     }
 }

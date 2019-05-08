@@ -2,9 +2,12 @@
 
 namespace App\Console;
 
-use App\Importers\Taxonomy\FileImporter;
+use App\Console\Commands\ImportTaxonomy;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
+const EXIT_OK = 0;
+const EXIT_FAILURE = 1;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,9 +28,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(new FileImporter())->everyMinute()->onFailure(function () {
-
-        });
+        $schedule->command(ImportTaxonomy::class)->everyMinute();
     }
 
     /**
