@@ -4,5 +4,5 @@ namespace App\Importers;
 
 interface ImporterInterface
 {
-    public function __invoke();
+    public function run();
 }

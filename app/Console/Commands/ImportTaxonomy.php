@@ -42,7 +42,7 @@ class ImportTaxonomy extends Command
     public function handle()
     {
         try {
-            (new FileImporter())();
+            app(FileImporter::class)->run();
         } catch (\Exception $e) {
             echo $e->getMessage();
             return EXIT_FAILURE;
