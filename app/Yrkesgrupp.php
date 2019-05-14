@@ -13,4 +13,9 @@ class Yrkesgrupp extends Model
     protected $casts = [
         'yrkesbenamningar' => 'array'
     ];
+
+    public function yrkesomraden()
+    {
+        return $this->belongsToMany(Yrkesomrade::class, 'yrkesomraden_has_yrkesgrupper');
+    }
 }

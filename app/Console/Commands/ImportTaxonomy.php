@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use const App\Console\EXIT_FAILURE;
 use const App\Console\EXIT_OK;
+use App\Importers\Taxonomy\ApiImporter;
 use App\Importers\Taxonomy\FileImporter;
 use Faker\Provider\File;
 use Illuminate\Console\Command;
@@ -42,7 +43,7 @@ class ImportTaxonomy extends Command
     public function handle()
     {
         try {
-            app(FileImporter::class)->run();
+            app(ApiImporter::class)->run();
         } catch (\Exception $e) {
             echo $e->getMessage();
             return EXIT_FAILURE;
