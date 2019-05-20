@@ -24,9 +24,9 @@ abstract class BaseMapper
 
     public function toArray()
     {
-        $properties = (new \ReflectionObject($this))->getProperties(ReflectionProperty::IS_PUBLIC);
+        $properties = (new ReflectionObject($this))->getProperties(ReflectionProperty::IS_PUBLIC);
 
-        return collect($properties)->mapWithKeys(function ($property) {
+        return collect($properties)->mapWithKeys(function (ReflectionProperty $property) {
             return [Str::snake($property->getName()) => $property->getValue($this)];
         })->toArray();
     }
