@@ -4,7 +4,7 @@ namespace App\Importers\Taxonomy\Mappings;
 
 class YrkesomradeMapper extends BaseMapper
 {
-    public $optionalId;
+    public $externalId;
     public $source = 'Arbetsförmedlingen';
     public $name;
     public $description;
@@ -12,7 +12,7 @@ class YrkesomradeMapper extends BaseMapper
     protected static function mappings()
     {
         return [
-            'LocaleFieldID' => 'optionalId',
+            'LocaleFieldID' => 'externalId',
             'Term' => 'name',
             'Description' => 'description',
         ];

@@ -16,7 +16,7 @@ class CreateYrkesomradenTable extends Migration
         Schema::create('yrkesomraden', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('source');
-            $table->string('optional_id')->nullable();
+            $table->string('external_id')->nullable();
             $table->string('name');
             $table->text('description');
             $table->timestamps();

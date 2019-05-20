@@ -10,13 +10,23 @@ class Yrkesomrade extends Model
 
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function yrkesgrupper()
     {
         return $this->belongsToMany(Yrkesgrupp::class, 'yrkesomraden_has_yrkesgrupper');
     }
 
-    public function scopeTaxonomyId($query, $optionalId)
+    /**
+     * Find Yrkesomrade from Arbetsförmedlingen Taxonomy
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param $optionalId
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFromArbetsformedlingenByExternalId($query, $optionalId)
     {
-        return $query->whereSource('Arbetsförmedlingen')->whereOptionalId($optionalId);
+        return $query->whereSource('Arbetsförmedlingen')->whereExternalId($optionalId);
     }
 }

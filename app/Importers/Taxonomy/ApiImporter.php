@@ -15,7 +15,25 @@ class ApiImporter implements ImporterInterface
     const LANG_CODE = 502;
     const API_URL = 'http://api.arbetsformedlingen.se/taxonomi/v0/TaxonomiService.asmx?wsdl';
 
+    /**
+     * @var \Zend\Soap\Client
+     */
     protected $client;
+
+    /**
+     * @var \Illuminate\Support\Collection;
+     */
+    public $yrkesomraden;
+
+    /**
+     * @var \Illuminate\Support\Collection;
+     */
+    public $yrkesgrupper;
+
+    /**
+     * @var \Illuminate\Support\Collection;
+     */
+    public $yrkesbenamningar;
 
     public function __construct()
     {
@@ -28,6 +46,9 @@ class ApiImporter implements ImporterInterface
         ]);
     }
 
+    /**
+     * @return \stdClass
+     */
     public static function params(): \stdClass
     {
         return (object)([
@@ -37,42 +58,93 @@ class ApiImporter implements ImporterInterface
 
     public function run()
     {
-        $yrkesomraden = $this->getYrkesomraden();
-        $yrkesgrupper = $this->getYrkesgrupper();
-        $yrkesbenamningar = $this->getYrkesbenamningar();
+        $this->fetchAll();
 
-        $yrkesomraden->each(function ($yrkesomrade) {
-            Yrkesomrade::updateOrCreate(['optional_id' => $yrkesomrade->optionalId], $yrkesomrade->toArray());
-        });
+        $this->mapYrkesbenamningarToYrkesgrupper();
 
-        // Map yrkesbenamningar to yrkesgrupper
-        $yrkesbenamningar->each(function ($yrkesbenamning) use ($yrkesgrupper) {
-            $yrkesgrupper->firstWhere('ssyk', $yrkesbenamning->ssyk)->addYrkesbenamning($yrkesbenamning->name);
-        });
-
-        // Create yrkesgrupp and sync it to yrkesomrade
-        $yrkesgrupper->each(function ($yrkesgrupp) {
-            $yrkesomrade = Yrkesomrade::taxonomyId($yrkesgrupp->yrkesomradeId)->first();
-            $created = Yrkesgrupp::updateOrCreate(['ssyk' => $yrkesgrupp->ssyk], $yrkesgrupp->toArray());
-            $created->yrkesomraden()->syncWithoutDetaching($yrkesomrade);
-        });
+        $this->insertYrkesomraden();
+        $this->insertYrkesgrupper();
     }
 
-    public function getYrkesomraden()
+    /**
+     * @return $this
+     */
+    public function insertYrkesomraden()
+    {
+        $this->yrkesomraden->each(function ($yrkesomrade) {
+            Yrkesomrade::updateOrCreate(['external_id' => $yrkesomrade->externalId], $yrkesomrade->toArray());
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function insertYrkesgrupper()
+    {
+        $this->yrkesgrupper->each(function ($yrkesgrupp) {
+            // Find matching yrkesområde by the external id
+            $yrkesomrade = Yrkesomrade::fromArbetsformedlingenByExternalId($yrkesgrupp->yrkesomradeId)->first();
+
+            // Update or create yrkesgrupp
+            $yrkesgrupp = Yrkesgrupp::updateOrCreate(['ssyk' => $yrkesgrupp->ssyk], $yrkesgrupp->toArray());
+
+            // Sync yrkesgrupp to yrkesområde
+            $yrkesgrupp->yrkesomraden()->syncWithoutDetaching($yrkesomrade);
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function mapYrkesbenamningarToYrkesgrupper()
+    {
+        $this->yrkesbenamningar->each(function ($yrkesbenamning) {
+            $this->yrkesgrupper->firstWhere('ssyk', $yrkesbenamning->ssyk)->addYrkesbenamning($yrkesbenamning->name);
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function fetchAll()
+    {
+        $this->yrkesomraden = $this->fetchYrkesomraden();
+        $this->yrkesgrupper = $this->fetchYrkesgrupper();
+        $this->yrkesbenamningar = $this->fetchYrkesbenamningar();
+
+        return $this;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function fetchYrkesomraden()
     {
         $res = $this->client->GetAllLocaleFields(self::params())->GetAllLocaleFieldsResult;
 
         return collect($res)->flatten();
     }
 
-    public function getYrkesgrupper()
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function fetchYrkesgrupper()
     {
         $res = $this->client->GetAllLocaleGroups(self::params())->GetAllLocaleGroupsResult;
 
         return collect($res)->flatten();
     }
 
-    public function getYrkesbenamningar()
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function fetchYrkesbenamningar()
     {
         $res = $this->client->GetAllOccupationNames(self::params())->GetAllOccupationNamesResult;
 
