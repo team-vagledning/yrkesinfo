@@ -18,4 +18,9 @@ class Yrkesgrupp extends Model
     {
         return $this->belongsToMany(Yrkesomrade::class, 'yrkesomraden_has_yrkesgrupper');
     }
+
+    public function yrkesstatistik()
+    {
+        return $this->hasMany(Yrkesstatistik::class, 'yrkesgrupp_id');
+    }
 }
