@@ -16,6 +16,7 @@ class CreateYrkesgrupperTable extends Migration
         Schema::create('yrkesgrupper', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('ssyk');
+            $table->jsonb('alternative_ssyk')->nullable();
             $table->string('name')->index();
             $table->text('description');
             $table->jsonb('yrkesbenamningar');

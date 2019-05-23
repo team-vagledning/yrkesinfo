@@ -11,7 +11,8 @@ class Yrkesgrupp extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'yrkesbenamningar' => 'array'
+        'alternative_ssyk' => 'array',
+        'yrkesbenamningar' => 'array',
     ];
 
     public function yrkesomraden()
@@ -22,5 +23,14 @@ class Yrkesgrupp extends Model
     public function yrkesstatistik()
     {
         return $this->hasMany(Yrkesstatistik::class, 'yrkesgrupp_id');
+    }
+
+    public function alternativeSsykOrOriginal()
+    {
+        if (empty($this->alternative_ssyk) === false) {
+            return $this->alternative_ssyk;
+        }
+
+        return $this->ssyk;
     }
 }

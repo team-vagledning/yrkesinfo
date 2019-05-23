@@ -7,6 +7,7 @@ use App\Yrkesgrupp;
 use App\YrkesstatistikSource;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class ApiImporter implements ImporterInterface
 {
@@ -25,22 +26,38 @@ class ApiImporter implements ImporterInterface
         $sources = $this->getSources();
         $yrkesgrupper = $this->getYrkesgrupper();
 
+        // For every yrkesgrupp (SSYK) we'll try to fetch statistics from every source
         foreach ($yrkesgrupper as $yrkesgrupp) {
             foreach ($sources as $source) {
+
                 $statistics = $this->fetchStatistics($yrkesgrupp, $source);
 
-                if (self::validStatistics($statistics)) {
-                    echo "Fetched: {$source->supplier}::{$source->name} for {$yrkesgrupp->ssyk} ({$yrkesgrupp->name})\n";
-
+                if ($valid = self::validStatistics($statistics)) {
                     $yrkesgrupp->yrkesstatistik()->create([
                         'yrkesstatistik_source_id' => $source->id,
                         'statistics' => $statistics
                     ]);
-                } else {
-                    echo "No statistics: {$source->supplier}::{$source->name} for {$yrkesgrupp->ssyk} ({$yrkesgrupp->name})\n";
                 }
+
+                self::log($yrkesgrupp, $source, $valid);
             }
         }
+    }
+
+    /**
+     * Just a logger, will output to terminal and log to file
+     *
+     * @param $yrkesgrupp
+     * @param $source
+     * @param bool $successful
+     */
+    public static function log($yrkesgrupp, $source, $successful = true)
+    {
+        $successful = $successful ? "Fetched" : "No statistics";
+        $logMessage = "{$successful} {$source->supplier}::{$source->name} for {$yrkesgrupp->ssyk} ({$yrkesgrupp->name})";
+
+        Log::info($logMessage);
+        echo $logMessage . PHP_EOL;
     }
 
     /**
@@ -51,56 +68,82 @@ class ApiImporter implements ImporterInterface
      */
     public function fetchStatistics($yrkesgrupp, $source)
     {
-        [$endpoint, $payload] = $this->transformPayload($yrkesgrupp->ssyk, $source->meta);
+        // Get endpoint and payload from the meta, and insert the correct SSYK
+        [$endpoint, $payload] = $this->transformPayload($yrkesgrupp->alternativeSsykOrOriginal(), $source);
 
+        // Try to fetch statistics five times, with 10s sleep between retries
         $results = retry(5, function () use ($endpoint, $payload) {
             return $this->client->post($endpoint, ['json' => $payload]);
         }, 10000);
 
-        $contents = $results->getBody()->getContents();
+        // Get the response. We also have to remove any BOM characters before decoding
+        $contents = self::removeBOM($results->getBody()->getContents());
 
-        $decoded = \GuzzleHttp\json_decode(self::removeBOM($contents), true);
-
-        return $decoded;
+        // Return a assoc decoded array. In this case we'll use the Guzzle decoder as it will
+        // throw any json decoder errors
+        return \GuzzleHttp\json_decode($contents, true);
     }
 
     /**
      * @param $ssyk
-     * @param $meta
+     * @param $source
      * @return array
+     * @throws \Exception
      */
-    public function transformPayload($ssyk, $meta)
+    public function transformPayload($ssyk, $source)
     {
-        $endpoint = $meta['endpoint'];
-        $payload = $meta;
-
-        $key = false;
-        foreach ($meta['query'] as $k => $v) {
-            if ($v['code'] === 'Yrke2012') {
-                $key = $k;
-            }
+        // Ssyk should be in an array
+        if (is_array($ssyk) === false) {
+            $ssyk = [$ssyk];
         }
 
-        Arr::set($payload, "query.{$key}.selection.values", [$ssyk]);
+        // Set payload from meta
+        $payload = $source->meta;
+
+        // Set the endpoint and remove it from the payload
+        $endpoint = $payload['endpoint'];
         Arr::forget($payload, 'endpoint');
 
+        // Find the key to where to insert the SSYK
+        $key = self::getQueryKey($payload['query'], 'Yrke2012');
+
+        if ($key === false) {
+            throw new \Exception("The payload for source {$source->id} is invalid, missing place to insert");
+        }
+
+        // Set SSYK in the payload
+        data_set($payload, $key, $ssyk);
+
+        // Return endpoint and payload as separate parts
         return [$endpoint, $payload];
     }
 
+    public static function getQueryKey($query, $keyValue)
+    {
+        $key = false;
+        foreach ($query as $k => $v) {
+            if ($v['code'] === $keyValue) {
+                $key = "query.{$k}.selection.values";
+            }
+        }
+
+        return $key;
+    }
+
     /**
+     * Statistics from SCB is only valid if there's a column named Yrke2012
+     *
      * @param $statistics
      * @return bool
      */
     public static function validStatistics($statistics) {
-        $valid = false;
-
         foreach ($statistics['columns'] as $v) {
-            if ($v['code'] === 'Yrke2012') {
-                $valid = true;
+            if (data_get($v, 'code') === 'Yrke2012') {
+                return true;
             }
         }
 
-        return $valid;
+        return false;
     }
 
     /**

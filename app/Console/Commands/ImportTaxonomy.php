@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use const App\Console\EXIT_FAILURE;
 use const App\Console\EXIT_OK;
+use App\Importers\Taxonomy\AlternativeSsykImporter;
 use App\Importers\Taxonomy\ApiImporter;
 use App\Importers\Taxonomy\FileImporter;
 use Faker\Provider\File;
@@ -44,6 +45,9 @@ class ImportTaxonomy extends Command
     {
         try {
             app(ApiImporter::class)->run();
+
+            app(AlternativeSsykImporter::class)->run();
+
         } catch (\Exception $e) {
             echo $e->getMessage();
             return EXIT_FAILURE;
