@@ -29,7 +29,6 @@ class ApiImporter implements ImporterInterface
         // For every yrkesgrupp (SSYK) we'll try to fetch statistics from every source
         foreach ($yrkesgrupper as $yrkesgrupp) {
             foreach ($sources as $source) {
-
                 $statistics = $this->fetchStatistics($yrkesgrupp, $source);
 
                 if ($valid = self::validStatistics($statistics)) {
@@ -118,16 +117,20 @@ class ApiImporter implements ImporterInterface
         return [$endpoint, $payload];
     }
 
+    /**
+     * @param $query
+     * @param $keyValue
+     * @return bool|string
+     */
     public static function getQueryKey($query, $keyValue)
     {
-        $key = false;
         foreach ($query as $k => $v) {
-            if ($v['code'] === $keyValue) {
-                $key = "query.{$k}.selection.values";
+            if (data_get($v, 'code') === $keyValue) {
+                return "query.{$k}.selection.values";
             }
         }
 
-        return $key;
+        return false;
     }
 
     /**
@@ -136,7 +139,8 @@ class ApiImporter implements ImporterInterface
      * @param $statistics
      * @return bool
      */
-    public static function validStatistics($statistics) {
+    public static function validStatistics($statistics)
+    {
         foreach ($statistics['columns'] as $v) {
             if (data_get($v, 'code') === 'Yrke2012') {
                 return true;
@@ -166,7 +170,8 @@ class ApiImporter implements ImporterInterface
      * @param $data
      * @return string
      */
-    public static function removeBOM($data) {
+    public static function removeBOM($data)
+    {
         if (0 === strpos(bin2hex($data), 'efbbbf')) {
             return substr($data, 3);
         }
