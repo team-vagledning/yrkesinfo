@@ -141,7 +141,7 @@ class ApiImporter implements ImporterInterface
      */
     public static function validStatistics($statistics)
     {
-        foreach ($statistics['columns'] as $v) {
+        foreach (data_get($statistics, 'columns', []) as $v) {
             if (data_get($v, 'code') === 'Yrke2012') {
                 return true;
             }
