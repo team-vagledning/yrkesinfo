@@ -35,7 +35,6 @@ class AddStatisticsSource extends Migration
     public static function data()
     {
         $data = base64_decode("
-        
             ewoJInF1ZXJ5IjogW3sKCQkJImNvZGUiOiAiWXJrZTIwMTIiLAoJCQkic2VsZ
             WN0aW9uIjogewoJCQkJImZpbHRlciI6ICJpdGVtIiwKCQkJCSJ2YWx1ZXMiOi
             BbXQoJCQl9CgkJfSwKCQl7CgkJCSJjb2RlIjogIkFyYmV0c1Nla3RvciIsCgk
