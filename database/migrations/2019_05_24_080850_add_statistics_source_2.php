@@ -20,6 +20,7 @@ class AddStatisticsSource2 extends Migration
             'name' => 'anstallda,sektor,kon',
             'description' => 'Anställda (yrkesregistret) 16-64 år efter Yrke (SSYK 2012), arbetsställets sektortillhörighet, kön och år',
             'meta' => $data,
+            'aggregator' => \App\Aggregators\Yrkesstatistik\AnstalldaSektorKon::class,
         ]);
     }
 

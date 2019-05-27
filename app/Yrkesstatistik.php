@@ -23,4 +23,14 @@ class Yrkesstatistik extends Model
     {
         return $this->belongsTo(Yrkesgrupp::class, 'yrkesgrupp_id');
     }
+
+    public function scopeLatestPerSourceAndYrkesgrupp($query)
+    {
+        return $query->whereIn('id', function ($query) {
+            $query
+                ->select(\DB::raw('max(id)'))
+                ->from($this->table)
+                ->groupBy('yrkesstatistik_source_id', 'yrkesgrupp_id');
+        });
+    }
 }

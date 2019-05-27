@@ -20,6 +20,7 @@ class AddStatisticsSource1 extends Migration
             'name' => 'anstallda,lan,kon',
             'description' => 'Anställda 16-64 år med arbetsplats i regionen (dagbef) efter län, yrke (4-siffrig SSYK 2012) och kön. År 2014 - 2017',
             'meta' => $data,
+            'aggregator' => \App\Aggregators\Yrkesstatistik\AnstalldaLanKon::class,
         ]);
     }
 

@@ -19,6 +19,7 @@ class CreateYrkesstatistikSourcesTable extends Migration
             $table->string('name');
             $table->text('description');
             $table->jsonb('meta');
+            $table->string('aggregator')->nullable();
             $table->timestamps();
         });
     }
