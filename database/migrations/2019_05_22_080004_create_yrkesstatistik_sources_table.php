@@ -17,6 +17,7 @@ class CreateYrkesstatistikSourcesTable extends Migration
             $table->bigIncrements('id');
             $table->string('supplier');
             $table->string('name');
+            $table->text('description');
             $table->jsonb('meta');
             $table->timestamps();
         });

@@ -17,7 +17,8 @@ class AddStatisticsSource1 extends Migration
 
         \App\YrkesstatistikSource::create([
             'supplier' => 'SCB',
-            'name' => 'Anställda 16-64 år med arbetsplats i regionen (dagbef) efter län, yrke (4-siffrig SSYK 2012) och kön. År 2014 - 2017',
+            'name' => 'anstallda,lan,kon',
+            'description' => 'Anställda 16-64 år med arbetsplats i regionen (dagbef) efter län, yrke (4-siffrig SSYK 2012) och kön. År 2014 - 2017',
             'meta' => $data,
         ]);
     }

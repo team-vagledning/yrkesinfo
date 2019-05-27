@@ -17,7 +17,8 @@ class AddStatisticsSource2 extends Migration
 
         \App\YrkesstatistikSource::create([
             'supplier' => 'SCB',
-            'name' => 'Anställda (yrkesregistret) 16-64 år efter Yrke (SSYK 2012), arbetsställets sektortillhörighet, kön och år',
+            'name' => 'anstallda,sektor,kon',
+            'description' => 'Anställda (yrkesregistret) 16-64 år efter Yrke (SSYK 2012), arbetsställets sektortillhörighet, kön och år',
             'meta' => $data,
         ]);
     }
