@@ -25,6 +25,11 @@ class Yrkesgrupp extends Model
         return $this->hasMany(Yrkesstatistik::class, 'yrkesgrupp_id');
     }
 
+    public function yrkesstatistikAggregated()
+    {
+        return $this->hasOne(YrkesstatistikAggregated::class, 'yrkesgrupp_id');
+    }
+
     public function alternativeSsykOrOriginal()
     {
         if (empty($this->alternative_ssyk) === false) {

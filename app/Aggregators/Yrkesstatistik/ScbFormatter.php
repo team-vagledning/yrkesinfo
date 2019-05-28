@@ -2,7 +2,7 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
-trait ScbMapper
+trait ScbFormatter
 {
     protected static $MAN = 1;
     protected static $WOMAN = 2;
@@ -55,7 +55,7 @@ trait ScbMapper
             return self::$regions[$id];
         }
 
-        return self::$regions[99];
+        return end(self::$regions[99]);
     }
 
     public static function getSectionName($from)
@@ -66,7 +66,7 @@ trait ScbMapper
             return self::$sections[$id];
         }
 
-        return self::$sections['US'];
+        return end(self::$sections);
     }
 
     public static function getSex($from)

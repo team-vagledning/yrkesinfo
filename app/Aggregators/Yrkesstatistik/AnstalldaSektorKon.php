@@ -4,9 +4,9 @@ namespace App\Aggregators\Yrkesstatistik;
 
 use App\Yrkesstatistik;
 
-class AnstalldaSektorKon implements YrkesstatistikAggregatorInterface
+class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInterface
 {
-    use ScbMapper;
+    use ScbFormatter;
 
     public $aggregated = [];
 
@@ -30,18 +30,13 @@ class AnstalldaSektorKon implements YrkesstatistikAggregatorInterface
             $sex = self::getSex($row);
 
             $value = data_get($row, 'values.0', 0);
+            $value = self::value($value, 'summera');
 
-            // TODO: Maybe add as Offentlig vs Privat sektor
-            //data_inc($this->aggregated, "anstallda.{$year}.total", $value);
-            //data_inc($this->aggregated, "anstallda.{$year}.konsfordelning.{$sex}", $value);
-
-            data_inc($this->aggregated, "sektor.{$sector}.anstallda.{$year}.total", $value);
-            data_inc($this->aggregated, "sektor.{$sector}.anstallda.{$year}.konsfordelning.{$sex}", $value);
-
-
+            self::incValue($this->aggregated, "anstallda.sektor.{$sector}.{$year}.alla", $value);
+            self::incValue($this->aggregated, "anstallda.sektor.{$sector}.{$year}.konsfordelning.{$sex}", $value);
         }
 
-        dd($this->aggregated);
+        self::update($yrkesstatistik, $this->aggregated);
     }
 
 }

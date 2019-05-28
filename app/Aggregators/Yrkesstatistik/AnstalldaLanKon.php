@@ -4,9 +4,9 @@ namespace App\Aggregators\Yrkesstatistik;
 
 use App\Yrkesstatistik;
 
-class AnstalldaLanKon implements YrkesstatistikAggregatorInterface
+class AnstalldaLanKon extends BaseAggregator implements YrkesstatistikAggregatorInterface
 {
-    use ScbMapper;
+    use ScbFormatter;
 
     public $aggregated = [];
 
@@ -30,17 +30,15 @@ class AnstalldaLanKon implements YrkesstatistikAggregatorInterface
             $sex = self::getSex($row);
 
             $value = data_get($row, 'values.0', 0);
+            $value = self::value($value, 'summera');
 
-            data_inc($this->aggregated, "anstallda.{$year}.total", $value);
-            data_inc($this->aggregated, "anstallda.{$year}.konsfordelning.{$sex}", $value);
+            self::incValue($this->aggregated, "anstallda.total.{$year}.alla", $value);
+            self::incValue($this->aggregated, "anstallda.total.{$year}.konsfordelning.{$sex}", $value);
 
-            data_inc($this->aggregated, "regioner.{$region}.anstallda.{$year}.total", $value);
-            data_inc($this->aggregated, "regioner.{$region}.anstallda.{$year}.konsfordelning.{$sex}", $value);
-
-
+            self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.alla", $value);
+            self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.konsfordelning.{$sex}", $value);
         }
 
-        dd($this->aggregated);
+        self::update($yrkesstatistik, $this->aggregated);
     }
-
 }
