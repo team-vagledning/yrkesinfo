@@ -17,12 +17,13 @@ abstract class BaseAggregator
         ]);
     }
 
-    public static function value($value, $strategy)
+    public static function value($value, $strategy, $against = '')
     {
         return [
             'typ' => 'värde',
-            'varde' => $value,
+            'varde' => is_numeric($value) ? $value : 0,
             'strategi' => $strategy,
+            'mot' => $against,
         ];
     }
 

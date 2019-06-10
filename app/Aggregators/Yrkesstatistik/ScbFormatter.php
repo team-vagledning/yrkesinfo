@@ -6,6 +6,13 @@ trait ScbFormatter
 {
     protected static $MAN = 1;
     protected static $WOMAN = 2;
+    protected static $BOTH_SEXES = '1+2';
+
+    protected static $SEXES = [
+        '1' => 'man',
+        '2' => 'kvinna',
+        '1+2' => 'alla',
+    ];
 
     public static $regions = [
         '00' => 'Riket',
@@ -34,6 +41,7 @@ trait ScbFormatter
     ];
 
     public static $sections = [
+        '0' => 'samtliga sektorer',
         '11' => 'statlig förvaltning',
         '1110' => 'statliga affärsverk',
         '1120' => 'primärkommunal förvaltning',
@@ -72,8 +80,7 @@ trait ScbFormatter
     public static function getSex($from)
     {
         $value = self::getKeyValue($from, self::getKey('SEX'));
-
-        return $value == self::$MAN ? 'man': 'kvinna';
+        return self::$SEXES[$value];
     }
 
     public static function getYear($from)

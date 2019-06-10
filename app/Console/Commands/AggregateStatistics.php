@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Aggregators\Yrkesstatistik\YrkesomradeAggregator;
 use App\Yrkesstatistik;
+use App\YrkesstatistikAggregated;
 use Illuminate\Console\Command;
 
 class AggregateStatistics extends Command
@@ -38,7 +40,7 @@ class AggregateStatistics extends Command
      */
     public function handle()
     {
-        //
+
         foreach (Yrkesstatistik::latestPerSourceAndYrkesgrupp()->get() as $statistics) {
             $aggregator = $statistics->source->aggregator;
 
@@ -46,5 +48,8 @@ class AggregateStatistics extends Command
                 app()->make($aggregator)->run($statistics);
             }
         }
+
+        //resolve(YrkesomradeAggregator::class)->run();
+
     }
 }
