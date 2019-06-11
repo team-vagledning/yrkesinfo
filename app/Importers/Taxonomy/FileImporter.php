@@ -5,6 +5,7 @@ namespace App\Importers\Taxonomy;
 use App\Importers\CsvObject;
 use App\Importers\ImporterInterface;
 use App\Yrkesgrupp;
+use App\Yrkesomrade;
 use League\Csv\Reader;
 
 
@@ -25,7 +26,18 @@ class FileImporter implements ImporterInterface
         $this->parseFile(self::REMOTE_FILE)->transformRecords();
 
         foreach ($this->getRecords() as $record) {
-            Yrkesgrupp::updateOrCreate(['ssyk' => $record['ssyk']], $record);
+
+            $yrkesomrade = Yrkesomrade::updateOrCreate(['external_id' => $record['yrkesomrade']['external_id']], [
+                'external_id' => $record['yrkesomrade']['external_id'],
+                'name' => $record['yrkesomrade']['name'],
+                'source' => 'Arbetsförmedlingen',
+                'description' => 'N/A',
+            ]);
+
+            $yrkesgrupp = Yrkesgrupp::updateOrCreate(['ssyk' => $record['ssyk']], \Arr::except($record, 'yrkesomrade'));
+
+            // Sync yrkesgrupp to yrkesområde
+            $yrkesgrupp->yrkesomraden()->syncWithoutDetaching($yrkesomrade);
         }
     }
 
@@ -40,6 +52,10 @@ class FileImporter implements ImporterInterface
             // If not yet transformed
             if (array_key_exists($ssyk, $transformed) === false) {
                 $transformed[$ssyk] = [
+                    'yrkesomrade' => [
+                        'external_id' => $record['occupationFieldId'],
+                        'name' => $record['occupationFieldTerm']
+                    ],
                     'ssyk' => $ssyk,
                     'name' => $record['ssykTerm'],
                     'description' => $record['ssykDescription'],

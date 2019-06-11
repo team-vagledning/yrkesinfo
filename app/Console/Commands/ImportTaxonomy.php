@@ -17,7 +17,7 @@ class ImportTaxonomy extends Command
      *
      * @var string
      */
-    protected $signature = 'import:taxonomy';
+    protected $signature = 'import:taxonomy {--source=api}';
 
     /**
      * The console command description.
@@ -44,7 +44,11 @@ class ImportTaxonomy extends Command
     public function handle()
     {
         try {
-            app(ApiImporter::class)->run();
+            if ($this->option('source') === 'file') {
+                app(FileImporter::class)->run();
+            } else {
+                app(ApiImporter::class)->run();
+            }
 
             app(AlternativeSsykImporter::class)->run();
 
