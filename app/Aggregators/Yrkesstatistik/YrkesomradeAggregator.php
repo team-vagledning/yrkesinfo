@@ -20,13 +20,16 @@ class YrkesomradeAggregator extends BaseAggregator
         foreach ($yrkesomraden as $yrkesomrade) {
             $a = [];
             foreach ($yrkesomrade->yrkesgrupper as $yrkesgrupp) {
-                $statistics = $yrkesgrupp->yrkesstatistikAggregated()->first()->statistics;
-                $keys = self::findVardeKeys($statistics);
+                $statistics = $yrkesgrupp->yrkesstatistikAggregated()->first();
+
+                $keys = self::findVardeKeys($statistics->statistics);
 
                 foreach ($keys as $key) {
-                    $valueObject = data_get($statistics, $key);
+                    $valueObject = data_get($statistics->statistics, $key);
 
-                    dd($key, $yrkesgrupp->name);
+                    if (is_null($valueObject)) {
+                        continue;
+                    }
 
                     switch ($valueObject['strategi']) {
                         case 'summera':
@@ -34,12 +37,11 @@ class YrkesomradeAggregator extends BaseAggregator
                             self::incValue($a, $key, $value);
                             break;
                         default:
-                            throw new \Exception("No valid strategy, what to do?");
+                            throw new \Exception("No valid strategy, what to do? Strategy: {$valueObject['strategi']}");
                     }
                 }
             }
-
-            dd(data_get($a, 'anstallda.total.2017.alla'));
+            
         }
 
     }

@@ -44,13 +44,22 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
             //      mot: "anstallda.total.2017.alla"
             // }
 
-            $value = data_get($row, 'values.' . self::AVARAGE, 0);
-            $value = self::value($value, 'viktat-medelvärde', 'test');
+            $avarageSalary = data_get($row, 'values.' . self::AVARAGE, 0);
+            $avarageSalary = self::value($avarageSalary, 'viktat-medelvärde', "anstallda.total.{$year}", 'medellön');
 
-            dd($value);
+            $avarageSalaryPercentile10 = data_get($row, 'values.' . self::PERCENTILE_10, 0);
+            $avarageSalaryPercentile10 = self::value($avarageSalaryPercentile10, 'viktat-medelvärde', "anstallda.total.{$year}", 'medellön-percentil10');
 
-            self::incValue($this->aggregated, "anstallda.sektor.{$sector}.{$year}.alla", $value);
-            self::incValue($this->aggregated, "anstallda.sektor.{$sector}.{$year}.konsfordelning.{$sex}", $value);
+
+            $avarageSalaryPercentile90 = data_get($row, 'values.' . self::PERCENTILE_90, 0);
+            $avarageSalaryPercentile90 = self::value($avarageSalaryPercentile90, 'viktat-medelvärde', "anstallda.total.{$year}", 'medellön-percentil90');
+
+
+            if ($sex === "bada") {
+                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.alla", $avarageSalary);
+            } else {
+                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.konsfordelning.{$sex}", $avarageSalary);
+            }
         }
 
         self::update($yrkesstatistik, $this->aggregated);

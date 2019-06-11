@@ -4,14 +4,10 @@ namespace App\Aggregators\Yrkesstatistik;
 
 trait ScbFormatter
 {
-    protected static $MAN = 1;
-    protected static $WOMAN = 2;
-    protected static $BOTH_SEXES = '1+2';
-
     protected static $SEXES = [
         '1' => 'man',
         '2' => 'kvinna',
-        '1+2' => 'alla',
+        '1+2' => 'bada',
     ];
 
     public static $regions = [

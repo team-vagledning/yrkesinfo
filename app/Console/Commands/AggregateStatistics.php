@@ -41,15 +41,15 @@ class AggregateStatistics extends Command
     public function handle()
     {
 
-        foreach (Yrkesstatistik::latestPerSourceAndYrkesgrupp()->get() as $statistics) {
+        /*foreach (Yrkesstatistik::latestPerSourceAndYrkesgrupp()->get() as $statistics) {
             $aggregator = $statistics->source->aggregator;
 
             if ($aggregator) {
                 app()->make($aggregator)->run($statistics);
             }
-        }
+        }*/
 
-        //resolve(YrkesomradeAggregator::class)->run();
+        resolve(YrkesomradeAggregator::class)->run();
 
     }
 }
