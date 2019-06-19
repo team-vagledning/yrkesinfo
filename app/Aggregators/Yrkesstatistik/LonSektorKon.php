@@ -45,20 +45,24 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
             // }
 
             $avarageSalary = data_get($row, 'values.' . self::AVARAGE, 0);
-            $avarageSalary = self::value($avarageSalary, 'viktat-medelvärde', "anstallda.total.{$year}", 'medellön');
+            $avarageSalary = self::value($avarageSalary, 'viktat-medelvärde', "anstallda.total.{$year}");
 
             $avarageSalaryPercentile10 = data_get($row, 'values.' . self::PERCENTILE_10, 0);
-            $avarageSalaryPercentile10 = self::value($avarageSalaryPercentile10, 'viktat-medelvärde', "anstallda.total.{$year}", 'medellön-percentil10');
+            $avarageSalaryPercentile10 = self::value($avarageSalaryPercentile10, 'viktat-medelvärde', "anstallda.total.{$year}");
 
 
             $avarageSalaryPercentile90 = data_get($row, 'values.' . self::PERCENTILE_90, 0);
-            $avarageSalaryPercentile90 = self::value($avarageSalaryPercentile90, 'viktat-medelvärde', "anstallda.total.{$year}", 'medellön-percentil90');
+            $avarageSalaryPercentile90 = self::value($avarageSalaryPercentile90, 'viktat-medelvärde', "anstallda.total.{$year}");
 
 
             if ($sex === "bada") {
-                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.alla", $avarageSalary);
+                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.alla.medellon", $avarageSalary);
+                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.alla.percentil10", $avarageSalaryPercentile10);
+                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.alla.percentil90", $avarageSalaryPercentile90);
             } else {
-                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.konsfordelning.{$sex}", $avarageSalary);
+                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.konsfordelning.{$sex}.medellon", $avarageSalary);
+                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.konsfordelning.{$sex}.percentil10", $avarageSalaryPercentile10);
+                self::incValue($this->aggregated, "lon.sektor.{$sector}.{$year}.konsfordelning.{$sex}.percentil90", $avarageSalaryPercentile90);
             }
         }
 

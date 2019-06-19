@@ -3,25 +3,23 @@
 namespace App\Console\Commands;
 
 use App\Aggregators\Yrkesstatistik\YrkesomradeAggregator;
-use App\Yrkesstatistik;
-use App\YrkesstatistikAggregated;
 use Illuminate\Console\Command;
 
-class AggregateStatistics extends Command
+class AggregateYrkesomraden extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'aggregate:statistics';
+    protected $signature = 'aggregate:yrkesomraden';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Aggregates statistics';
+    protected $description = 'Command description';
 
     /**
      * Create a new command instance.
@@ -40,16 +38,6 @@ class AggregateStatistics extends Command
      */
     public function handle()
     {
-
-        foreach (Yrkesstatistik::latestPerSourceAndYrkesgrupp()->get() as $statistics) {
-            $aggregator = $statistics->source->aggregator;
-
-            if ($aggregator) {
-                app()->make($aggregator)->run($statistics);
-            }
-        }
-
-        //resolve(YrkesomradeAggregator::class)->run();
-
+        resolve(YrkesomradeAggregator::class)->run();
     }
 }

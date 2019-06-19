@@ -20,11 +20,17 @@ class YrkesomradeAggregator extends BaseAggregator
         foreach ($yrkesomraden as $yrkesomrade) {
             $a = [];
             foreach ($yrkesomrade->yrkesgrupper as $yrkesgrupp) {
-                $statistics = $yrkesgrupp->yrkesstatistikAggregated()->first();
+                $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->first();
 
-                $keys = self::findVardeKeys($statistics->statistics);
+                $keys = self::findVardeKeys($aggregated->statistics);
 
-                foreach ($keys as $key) {
+
+
+                dd($keys);
+
+
+
+                /*foreach ($keys as $key) {
                     $valueObject = data_get($statistics->statistics, $key);
 
                     if (is_null($valueObject)) {
@@ -39,7 +45,7 @@ class YrkesomradeAggregator extends BaseAggregator
                         default:
                             throw new \Exception("No valid strategy, what to do? Strategy: {$valueObject['strategi']}");
                     }
-                }
+                }*/
             }
             
         }

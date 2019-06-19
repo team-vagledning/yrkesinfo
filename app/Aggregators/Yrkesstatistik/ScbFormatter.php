@@ -37,18 +37,18 @@ trait ScbFormatter
     ];
 
     public static $sections = [
-        '0' => 'samtliga sektorer',
-        '11' => 'statlig förvaltning',
-        '1110' => 'statliga affärsverk',
-        '1120' => 'primärkommunal förvaltning',
-        '1130' => 'landsting',
-        '15' => 'övriga offentliga institutioner',
-        '1510' => 'aktiebolag ej offentligt ägda',
-        '1520' => 'övriga företag ej offentligt ägda',
-        '1530' => 'statligt ägda företag och organisationer',
-        '1540' => 'kommunalt ägda företag och organisationer',
-        '1560' => 'övriga organisationer',
-        'US' => 'uppgift saknas',
+        '0' => 'samtliga',
+        '11' => 'offentlig', //'statlig förvaltning',
+        '1110' => 'offentlig', //'statliga affärsverk',
+        '1120' => 'offentlig', //'primärkommunal förvaltning',
+        '1130' => 'offentlig', //'landsting',
+        '15' => 'offentlig', //'övriga offentliga institutioner',
+        '1510' => 'privat', //'aktiebolag ej offentligt ägda',
+        '1520' => 'privat', //'övriga företag ej offentligt ägda',
+        '1530' => 'offentlig', //'statligt ägda företag och organisationer',
+        '1540' => 'offentlig', //'kommunalt ägda företag och organisationer',
+        '1560' => 'privat', //'övriga organisationer',
+        'US' => 'saknas', //'uppgift saknas',
     ];
 
     public static function getRegionName($from)
