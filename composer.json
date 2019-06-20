@@ -14,6 +14,7 @@
         "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
         "league/csv": "^9.0",
+        "maatwebsite/excel": "^3.1",
         "zendframework/zend-soap": "^2.8"
     },
     "require-dev": {

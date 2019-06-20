@@ -10,6 +10,10 @@ class Yrkesomrade extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'aggregated_statistics' => 'array'
+    ];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */

@@ -20,4 +20,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::namespace('Api\V1')->prefix('v1')->group(function () {
     Route::get('yrkesomraden', 'YrkesomradenController@index');
+    Route::get('yrkesomraden/{id}', 'YrkesomradenController@show');
 });

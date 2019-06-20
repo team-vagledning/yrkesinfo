@@ -12,4 +12,10 @@ class YrkesomradenController extends Controller
         $yrkesomraden = Yrkesomrade::all('name', 'external_id', 'description');
         return response()->json($yrkesomraden);
     }
+
+    public function show($externalId)
+    {
+        $yrkesomrade = Yrkesomrade::where('external_id', $externalId)->first();
+        return response()->json($yrkesomrade);
+    }
 }
