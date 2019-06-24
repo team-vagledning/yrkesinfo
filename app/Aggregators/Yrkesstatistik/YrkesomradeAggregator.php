@@ -33,24 +33,19 @@ class YrkesomradeAggregator extends BaseAggregator
                'percentil90' => 0,
             ];
 
-            $regioner = collect(resolve(Region::class)->get())->mapWithKeys(function ($region) use ($yrkesomrade) {
+            $regioner = resolve(Region::class)->get()->map(function ($region) use ($yrkesomrade) {
                 return [
-                    $region->name => [
-                        'id' => $region->external_id,
-                        'namn' => $region->name,
-                        'anstallda' => 0,
-                        'ledigaJobb' => $this->getAntalAnstalldaIRegion($yrkesomrade->external_id, $region->external_id),
-                        'bristindex' => $this->getBristindexForRegion($yrkesomrade, $region->id)
-                    ]
+                    'id' => $region->external_id,
+                    'namn' => $region->name,
+                    'anstallda' => 0,
+                    'ledigaJobb' => $this->getAntalAnstalldaIRegion($yrkesomrade->external_id, $region->external_id),
+                    'bristindex' => $this->getBristindexForRegion($yrkesomrade, $region->id)
                 ];
             })->toArray();
 
             foreach ($yrkesomrade->yrkesgrupper as $yrkesgrupp) {
                 $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->first();
-
-                //dd(self::findVardeKeys($aggregated->statistics));
-
-                //$keys = self::findVardeKeys($aggregated->statistics);
+                
                 $anstallda = data_get($aggregated->statistics, "anstallda.total.{$YEAR}.alla.varde");
                 $medellon = data_get($aggregated->statistics, "lon.sektor.samtliga.{$YEAR}.alla.medellon.varde");
                 $percentil10 = data_get($aggregated->statistics, "lon.sektor.samtliga.{$YEAR}.alla.percentil10.varde");
