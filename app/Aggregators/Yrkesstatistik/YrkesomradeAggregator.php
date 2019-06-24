@@ -21,7 +21,7 @@ class YrkesomradeAggregator extends BaseAggregator
         // Hur lösa medelvärden och viktade medelvärden?
         //
 
-        $yrkesomraden = Yrkesomrade::where('id', 1)->get();
+        $yrkesomraden = Yrkesomrade::get();
 
         foreach ($yrkesomraden as $yrkesomrade) {
 
