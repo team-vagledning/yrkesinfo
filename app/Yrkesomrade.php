@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class Yrkesomrade extends Model
 {
+    use HasRelationships;
+
     protected $table = 'yrkesomraden';
 
     protected $guarded = [];
@@ -20,6 +23,11 @@ class Yrkesomrade extends Model
     public function yrkesgrupper()
     {
         return $this->belongsToMany(Yrkesgrupp::class, 'yrkesomraden_has_yrkesgrupper');
+    }
+
+    public function bristindex()
+    {
+        return $this->hasManyDeep(BristindexYrkesgrupp::class, ['yrkesomraden_has_yrkesgrupper', Yrkesgrupp::class]);
     }
 
     /**

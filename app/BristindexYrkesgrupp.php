@@ -20,4 +20,14 @@ class BristindexYrkesgrupp extends Model
     {
         return $this->belongsTo(Yrkesgrupp::class, 'yrkesgrupp_id');
     }
+
+    public function scopeFemAr($query)
+    {
+        return $query->where('omfang', 5);
+    }
+
+    public function scopeEttAr($query)
+    {
+        return $query->where('omfang', 1);
+    }
 }

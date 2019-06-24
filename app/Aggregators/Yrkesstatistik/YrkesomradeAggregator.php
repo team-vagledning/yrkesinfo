@@ -2,7 +2,7 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
-use App\Regioner;
+use App\Region;
 use App\Yrkesomrade;
 use App\YrkesstatistikAggregated;
 use Arr;
@@ -21,7 +21,7 @@ class YrkesomradeAggregator extends BaseAggregator
         // Hur lösa medelvärden och viktade medelvärden?
         //
 
-        $yrkesomraden = Yrkesomrade::take(1)->get();
+        $yrkesomraden = Yrkesomrade::get();
 
         foreach ($yrkesomraden as $yrkesomrade) {
 
@@ -33,14 +33,14 @@ class YrkesomradeAggregator extends BaseAggregator
                'percentil90' => 0,
             ];
 
-            $regioner = collect(resolve(Regioner::class)->all())->mapWithKeys(function ($region, $id) use ($yrkesomrade) {
+            $regioner = collect(resolve(Region::class)->pluck('name', 'external_id'))->mapWithKeys(function ($region, $id) use ($yrkesomrade) {
                 return [
                     $region => [
                         'id' => $id,
                         'namn' => $region,
                         'anstallda' => 0,
-                        'konkurrens' => 0,
                         'ledigaJobb' => $this->getAntalAnstalldaIRegion($yrkesomrade->external_id, $id),
+                        'bristindex' => $this->getBristindexForRegion($yrkesomrade, $id)
                     ]
                 ];
             })->toArray();
@@ -75,10 +75,9 @@ class YrkesomradeAggregator extends BaseAggregator
 
             $r = [
                 "lon" => $lon,
+                "bristindex" => $this->getBristindex($yrkesomrade),
                 "regioner" => $regioner,
             ];
-
-            dd($r);
 
             $yrkesomrade->update([
                 'aggregated_statistics' => $r
@@ -113,5 +112,15 @@ class YrkesomradeAggregator extends BaseAggregator
         }
 
         return data_get($results, 'matchningslista.antal_platsannonser');
+    }
+
+    public function getBristindex($yrkesomrade)
+    {
+        return round($yrkesomrade->bristindex()->ettAr()->avg('bristindex'), 2);
+    }
+
+    public function getBristindexForRegion($yrkesomrade, $regionId)
+    {
+        return round($yrkesomrade->bristindex()->ettAr()->where('region_id', $regionId)->avg('bristindex'), 2);
     }
 }
