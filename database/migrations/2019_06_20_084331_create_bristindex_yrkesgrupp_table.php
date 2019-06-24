@@ -19,10 +19,12 @@ class CreateBristindexYrkesgruppTable extends Migration
             $table->bigInteger('yrkesgrupp_id')->unsigned();
             $table->foreign('yrkesgrupp_id')->references('id')->on('yrkesgrupper');
 
-            $table->bigInteger('region_id')->unsigned();
+            $table->bigInteger('region_id')->unsigned()->nullable();
             $table->foreign('region_id')->references('id')->on('regioner');
 
+            $table->string('omfang');
             $table->decimal('bristindex');
+
 
             $table->timestamps();
         });

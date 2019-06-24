@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Importers\Bristindex\YrkesgruppImport;
+use App\Importers\Bristindex\EttArImport;
+use App\Importers\Bristindex\FemArImport;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -39,6 +40,7 @@ class ImportBristindex extends Command
      */
     public function handle()
     {
-        Excel::import(new YrkesgruppImport, storage_path('imports/bristindex/yrkesomraden.xlsx'));
+        Excel::import(new FemArImport, storage_path('imports/bristindex/5-ar.xlsx'));
+        Excel::import(new EttArImport, storage_path('imports/bristindex/1-ar.xlsx'));
     }
 }
