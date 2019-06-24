@@ -21,7 +21,7 @@ class YrkesomradeAggregator extends BaseAggregator
         // Hur lösa medelvärden och viktade medelvärden?
         //
 
-        $yrkesomraden = Yrkesomrade::get();
+        $yrkesomraden = Yrkesomrade::where('id', 1)->get();
 
         foreach ($yrkesomraden as $yrkesomrade) {
 
@@ -33,14 +33,14 @@ class YrkesomradeAggregator extends BaseAggregator
                'percentil90' => 0,
             ];
 
-            $regioner = collect(resolve(Region::class)->pluck('name', 'external_id'))->mapWithKeys(function ($region, $id) use ($yrkesomrade) {
+            $regioner = collect(resolve(Region::class)->get())->mapWithKeys(function ($region) use ($yrkesomrade) {
                 return [
-                    $region => [
-                        'id' => $id,
-                        'namn' => $region,
+                    $region->name => [
+                        'id' => $region->external_id,
+                        'namn' => $region->name,
                         'anstallda' => 0,
-                        'ledigaJobb' => $this->getAntalAnstalldaIRegion($yrkesomrade->external_id, $id),
-                        'bristindex' => $this->getBristindexForRegion($yrkesomrade, $id)
+                        'ledigaJobb' => $this->getAntalAnstalldaIRegion($yrkesomrade->external_id, $region->external_id),
+                        'bristindex' => $this->getBristindexForRegion($yrkesomrade, $region->id)
                     ]
                 ];
             })->toArray();
@@ -116,11 +116,16 @@ class YrkesomradeAggregator extends BaseAggregator
 
     public function getBristindex($yrkesomrade)
     {
-        return round($yrkesomrade->bristindex()->ettAr()->avg('bristindex'), 2);
+        return self::round($yrkesomrade->bristindex()->ettAr()->avg('bristindex'));
     }
 
     public function getBristindexForRegion($yrkesomrade, $regionId)
     {
-        return round($yrkesomrade->bristindex()->ettAr()->where('region_id', $regionId)->avg('bristindex'), 2);
+        return self::round($yrkesomrade->bristindex()->ettAr()->where('region_id', $regionId)->avg('bristindex'));
+    }
+
+    public static function round($value)
+    {
+        return number_format(round($value, 2), 2, '.', '');
     }
 }
