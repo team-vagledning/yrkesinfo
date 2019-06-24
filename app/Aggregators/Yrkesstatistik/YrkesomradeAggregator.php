@@ -45,7 +45,7 @@ class YrkesomradeAggregator extends BaseAggregator
 
             foreach ($yrkesomrade->yrkesgrupper as $yrkesgrupp) {
                 $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->first();
-                
+
                 $anstallda = data_get($aggregated->statistics, "anstallda.total.{$YEAR}.alla.varde");
                 $medellon = data_get($aggregated->statistics, "lon.sektor.samtliga.{$YEAR}.alla.medellon.varde");
                 $percentil10 = data_get($aggregated->statistics, "lon.sektor.samtliga.{$YEAR}.alla.percentil10.varde");
@@ -58,8 +58,9 @@ class YrkesomradeAggregator extends BaseAggregator
                 $antalAnstallda += $anstallda;
 
                 // Karta
-                foreach ($regioner as $region => $values) {
-                    $regioner[$region]['anstallda'] = $values['anstallda'] + data_get($aggregated->statistics, "anstallda.regioner.{$region}.{$YEAR}.alla.varde");
+                foreach ($regioner as $key => $values) {
+                    $region = $values['namn'];
+                    $regioner[$key]['anstallda'] = $values['anstallda'] + data_get($aggregated->statistics, "anstallda.regioner.{$region}.{$YEAR}.alla.varde");
                 }
 
             }
@@ -103,6 +104,7 @@ class YrkesomradeAggregator extends BaseAggregator
 
             $results = json_decode($response->getBody()->getContents());
         } catch (\Exception $e) {
+
             return 0;
         }
 
