@@ -11,7 +11,8 @@ class YrkesomradenController extends Controller
 {
     public function index()
     {
-        $yrkesomraden = Yrkesomrade::all('name', 'external_id', 'description');
+        $yrkesomraden = Yrkesomrade::all('id', 'name', 'external_id', 'description');
+        
         return response()->json($yrkesomraden);
     }
 

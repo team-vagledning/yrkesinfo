@@ -13,6 +13,8 @@ class Yrkesomrade extends Model
 
     protected $guarded = [];
 
+    protected $appends = ['bristindex'];
+
     protected $casts = [
         'aggregated_statistics' => 'array'
     ];
@@ -25,9 +27,12 @@ class Yrkesomrade extends Model
         return $this->belongsToMany(Yrkesgrupp::class, 'yrkesomraden_has_yrkesgrupper');
     }
 
+    /**
+     * @return \Staudenmeir\EloquentHasManyDeep\HasManyDeep
+     */
     public function bristindex()
     {
-        return $this->hasManyDeep(BristindexYrkesgrupp::class, ['yrkesomraden_has_yrkesgrupper', Yrkesgrupp::class]);
+        return $this->hasManyDeepFromRelations($this->yrkesgrupper(), (new Yrkesgrupp)->bristindex());
     }
 
     /**
@@ -40,5 +45,13 @@ class Yrkesomrade extends Model
     public function scopeFromArbetsformedlingenByExternalId($query, $optionalId)
     {
         return $query->whereSource('Arbetsförmedlingen')->whereExternalId($optionalId);
+    }
+
+    public function getBristindexAttribute()
+    {
+        return [
+            'fem_ar' => BristindexYrkesgrupp::bristindexToText(round_number($this->bristindex()->femAr()->avg('bristindex'))),
+            'ett_ar' => BristindexYrkesgrupp::bristindexToText(round_number($this->bristindex()->ettAr()->avg('bristindex'))),
+        ];
     }
 }
