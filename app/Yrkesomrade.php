@@ -49,9 +49,18 @@ class Yrkesomrade extends Model
 
     public function getBristindexAttribute()
     {
+        $femAr = round_number($this->bristindex()->femAr()->avg('bristindex'));
+        $ettAr = round_number($this->bristindex()->ettAr()->avg('bristindex'));
+
         return [
-            'fem_ar' => BristindexYrkesgrupp::bristindexToText(round_number($this->bristindex()->femAr()->avg('bristindex'))),
-            'ett_ar' => BristindexYrkesgrupp::bristindexToText(round_number($this->bristindex()->ettAr()->avg('bristindex'))),
+            'fem_ar' => [
+                'varde' => $femAr,
+                'text' => BristindexYrkesgrupp::bristindexToText($femAr),
+            ],
+            'ett_ar' => [
+                'varde' => $ettAr,
+                'text' => BristindexYrkesgrupp::bristindexToText($ettAr),
+            ]
         ];
     }
 }
