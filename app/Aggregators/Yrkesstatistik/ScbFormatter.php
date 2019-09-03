@@ -51,6 +51,19 @@ trait ScbFormatter
         'US' => 'saknas', //'uppgift saknas',
     ];
 
+    public static $utbildningsniva = [
+        '1' => 'Ingen gymnasieutbildning',
+        '2' => 'Ingen gymnasieutbildning',
+        '3' => 'Gymnasieutbildning',
+        '4' => 'Gymnasieutbildning',
+        '5' => 'Gymnasieutbildning',
+        '6' => 'Eftergymnasial utbildning upp till 2 år',
+        '7' => 'Eftergymnasial utbildning upp till 2 år',
+        '8' => 'Eftergymnasial utbildning 3 år eller mer',
+        '9' => 'Eftergymnasial utbildning 3 år eller mer',
+        'US' => 'Uppgift saknas'
+    ];
+
     public static function getRegionName($from)
     {
         $id = self::getKeyValue($from, self::getKey('REGION'));
@@ -82,6 +95,12 @@ trait ScbFormatter
     public static function getYear($from)
     {
         return self::getKeyValue($from, self::getKey('YEAR'));
+    }
+
+    public static function getUtbildningsniva($from)
+    {
+        $value = self::getKeyValue($from, self::getKey('UTBILDNINGSNIVA'));
+        return self::$utbildningsniva[$value];
     }
 
     public static function getKey($name)

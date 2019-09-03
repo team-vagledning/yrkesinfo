@@ -2,6 +2,8 @@
 
 namespace App\Importers\Yrkesstatistik\SCB;
 
+use App\Console\Traits\HasProgressBar;
+use App\Console\Traits\UsesConsoleOutput;
 use App\Importers\ImporterInterface;
 use App\Yrkesgrupp;
 use App\YrkesstatistikSource;
@@ -11,20 +13,23 @@ use Illuminate\Support\Facades\Log;
 
 class ApiImporter implements ImporterInterface
 {
+    use UsesConsoleOutput, HasProgressBar;
+
     /**
-     * @var \GuzzleHttp\Client
+     * @var Client
      */
     protected $client;
 
-    public function __construct()
-    {
-        $this->client = new Client();
-    }
-
+    /**
+     * @throws \Exception
+     */
     public function run()
     {
+        $this->client = new Client();
         $sources = $this->getSources();
         $yrkesgrupper = $this->getYrkesgrupper();
+
+        $this->initializeProgressBar(count($sources) * count($yrkesgrupper));
 
         // For every yrkesgrupp (SSYK) we'll try to fetch statistics from every source
         foreach ($yrkesgrupper as $yrkesgrupp) {
@@ -38,25 +43,13 @@ class ApiImporter implements ImporterInterface
                     ]);
                 }
 
-                self::log($yrkesgrupp, $source, $valid);
+                $logMessage = $this->generateLogMessage($yrkesgrupp, $source, $valid);
+                $this->advanceProgressBar($logMessage);
+                Log::info($logMessage);
             }
         }
-    }
 
-    /**
-     * Just a logger, will output to terminal and log to file
-     *
-     * @param $yrkesgrupp
-     * @param $source
-     * @param bool $successful
-     */
-    public static function log($yrkesgrupp, $source, $successful = true)
-    {
-        $successful = $successful ? "Fetched" : "No statistics";
-        $logMessage = "{$successful} {$source->supplier}::{$source->name} for {$yrkesgrupp->ssyk} ({$yrkesgrupp->name})";
-
-        Log::info($logMessage);
-        echo $logMessage . PHP_EOL;
+        $this->finishProgressBar();
     }
 
     /**
@@ -176,5 +169,24 @@ class ApiImporter implements ImporterInterface
             return substr($data, 3);
         }
         return $data;
+    }
+
+    /**
+     * @param $yrkesgrupp
+     * @param $source
+     * @param bool $successful
+     * @return string
+     */
+    public function generateLogMessage($yrkesgrupp, $source, $successful = true)
+    {
+        $successful = $successful ? "<fg=green>Fetched</>" : "<fg=red>No statistics</>";
+
+        return implode(", ", [
+            $successful,
+            $source->supplier,
+            $source->name,
+            $yrkesgrupp->ssyk,
+            $yrkesgrupp->name,
+        ]);
     }
 }

@@ -20,8 +20,8 @@ class CreateYrkesstatistikTable extends Migration
             $table->jsonb('statistics');
             $table->timestamps();
 
-            $table->foreign('yrkesstatistik_source_id')->references('id')->on('yrkesstatistik_sources');
-            $table->foreign('yrkesgrupp_id')->references('id')->on('yrkesgrupper');
+            $table->foreign('yrkesstatistik_source_id')->references('id')->on('yrkesstatistik_sources')->onDelete('cascade');
+            $table->foreign('yrkesgrupp_id')->references('id')->on('yrkesgrupper')->onDelete('cascade');
         });
     }
 

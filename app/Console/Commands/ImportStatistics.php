@@ -38,6 +38,6 @@ class ImportStatistics extends Command
      */
     public function handle()
     {
-        app(ApiImporter::class)->run();
+        app(ApiImporter::class)->setConsoleOutput($this->output)->run();
     }
 }
