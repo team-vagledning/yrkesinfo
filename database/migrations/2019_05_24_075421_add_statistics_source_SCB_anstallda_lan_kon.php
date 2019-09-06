@@ -18,7 +18,8 @@ class AddStatisticsSourceSCBAnstalldaLanKon extends Migration
         \App\YrkesstatistikSource::create([
             'supplier' => 'SCB',
             'name' => 'anstallda,lan,kon',
-            'description' => 'Anställda 16-64 år med arbetsplats i regionen (dagbef) efter län, yrke (4-siffrig SSYK 2012) och kön. År 2014 - 2017',
+            'description' => 'Anställda 16-64 år med arbetsplats i' .
+                             'regionen (dagbef) efter län, yrke (4-siffrig SSYK 2012) och kön. År 2014 - 2017',
             'meta' => json_decode($data),
             'aggregator' => \App\Aggregators\Yrkesstatistik\AnstalldaLanKon::class,
         ]);
@@ -32,7 +33,30 @@ class AddStatisticsSourceSCBAnstalldaLanKon extends Migration
                 "code": "Region",
                 "selection": {
                     "filter": "vs:RegionLän99US",
-                    "values": ["01", "03", "04", "05", "06", "07", "08", "09", "10", "12", "13", "14", "17", "18", "19", "20", "21", "22", "23", "24", "25", "99"]
+                    "values": [
+                        "01",
+                        "03",
+                        "04",
+                        "05",
+                        "06",
+                        "07",
+                        "08",
+                        "09",
+                        "10",
+                        "12",
+                        "13",
+                        "14",
+                        "17",
+                        "18",
+                        "19",
+                        "20",
+                        "21",
+                        "22",
+                        "23",
+                        "24",
+                        "25",
+                        "99"
+                    ]
                 }
             }, {
                 "code": "Yrke2012",

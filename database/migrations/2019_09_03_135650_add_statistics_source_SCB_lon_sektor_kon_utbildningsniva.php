@@ -23,7 +23,8 @@ class AddStatisticsSourceSCBLonSektorKonUtbildningsniva extends Migration
         \App\YrkesstatistikSource::create([
             'supplier' => 'SCB',
             'name' => 'lon,sektor,kon,utbildningsniva',
-            'description' => 'Genomsnittlig grund- och månadslön samt kvinnors lön i procent av mäns lön efter sektor, yrke (SSYK 2012), kön och utbildningsnivå (SUN)',
+            'description' => 'Genomsnittlig grund- och månadslön samt kvinnors lön i procent av ' .
+                             'mäns lön efter sektor, yrke (SSYK 2012), kön och utbildningsnivå (SUN)',
             'meta' => json_decode($data),
             'aggregator' => \App\Aggregators\Yrkesstatistik\LonSektorKonUtbildningsniva::class,
         ]);

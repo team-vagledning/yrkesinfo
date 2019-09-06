@@ -18,7 +18,8 @@ class AddStatisticsSourceSCBAnstalldaUtbildningsnivaKon extends Migration
         \App\YrkesstatistikSource::create([
             'supplier' => 'SCB',
             'name' => 'anstallda,utbildningsniva,kon',
-            'description' => 'Anställda (yrkesregistret) 16-64 år efter Yrke (SSYK 2012), Utbildningsnivå SUN 2000, ålder, kön och år',
+            'description' => 'Anställda (yrkesregistret) 16-64 år efter ' .
+                             'Yrke (SSYK 2012), Utbildningsnivå SUN 2000, ålder, kön och år',
             'meta' => json_decode($data),
             'aggregator' => \App\Aggregators\Yrkesstatistik\AnstalldaUtbildningsnivaKon::class,
         ]);
