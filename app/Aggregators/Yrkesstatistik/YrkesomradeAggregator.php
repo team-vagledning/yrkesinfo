@@ -11,7 +11,7 @@ use Str;
 
 class YrkesomradeAggregator extends BaseAggregator
 {
-    const YEAR = '2017';
+    const YEAR = '2018';
 
     public function run()
     {

@@ -61,7 +61,8 @@ trait ScbFormatter
         '7' => 'Eftergymnasial utbildning upp till 2 år',
         '8' => 'Eftergymnasial utbildning 3 år eller mer',
         '9' => 'Eftergymnasial utbildning 3 år eller mer',
-        'US' => 'Uppgift saknas'
+        'TOTALT' => 'Samtliga utbildningsnivåer',
+        'US' => 'Uppgift saknas',
     ];
 
     public static function getRegionName($from)

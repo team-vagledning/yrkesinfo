@@ -23,6 +23,7 @@ class AnstalldaUtbildningsnivaKon extends BaseAggregator implements Yrkesstatist
 
     public function run(Yrkesstatistik $yrkesstatistik)
     {
+
         $data = $yrkesstatistik->statistics['data'];
 
         foreach ($data as $row) {
@@ -33,12 +34,10 @@ class AnstalldaUtbildningsnivaKon extends BaseAggregator implements Yrkesstatist
             $value = data_get($row, 'values.0', 0);
             $value = self::value($value, 'summera');
 
-            dd($year, $sex, $value, $utbildningsniva);
+            self::incValue($this->aggregated, "anstallda.utbildningsniva.{$utbildningsniva}.{$year}.alla", $value);
+            self::incValue($this->aggregated, "anstallda.utbildningsniva.{$utbildningsniva}.{$year}.konsfordelning.{$sex}", $value);
 
-            dd();
-
-            /*self::incValue($this->aggregated, "anstallda.total.{$year}.alla", $value);
-            self::incValue($this->aggregated, "anstallda.total.{$year}.konsfordelning.{$sex}", $value);
+            /*self::incValue($this->aggregated, "anstallda.total.{$year}.konsfordelning.{$sex}", $value);
 
             self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.alla", $value);
             self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.konsfordelning.{$sex}", $value);*/

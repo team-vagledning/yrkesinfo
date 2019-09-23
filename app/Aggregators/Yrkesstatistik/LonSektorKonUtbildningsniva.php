@@ -13,10 +13,10 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
     public static function keys()
     {
         return [
-            'SSYK' => 0,
-            'UTBILDNINGSNIVA' => 1,
-            'AGE' => 2,
-            'SEX' => 3,
+            'SEKTOR' => 0,
+            'SSYK' => 1,
+            'SEX' => 2,
+            'UTBILDNINGSNIVA' => 3,
             'YEAR' => 4,
         ];
     }
@@ -26,20 +26,20 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
         $data = $yrkesstatistik->statistics['data'];
 
         foreach ($data as $row) {
+
             $year = self::getYear($row);
             $sex = self::getSex($row);
             $utbildningsniva = self::getUtbildningsniva($row);
 
             $value = data_get($row, 'values.0', 0);
-            $value = self::value($value, 'summera');
+            $value = self::value($value, 'viktat-medelvärde', "anstallda.utbildningsniva.{$utbildningsniva}.{$year}.alla");
 
-            dd($year, $sex, $value, $utbildningsniva);
 
-            dd();
+            self::incValue($this->aggregated, "lon.utbildningsniva.{$utbildningsniva}.alla.medellon", $value);
 
-            /*self::incValue($this->aggregated, "anstallda.total.{$year}.alla", $value);
-            self::incValue($this->aggregated, "anstallda.total.{$year}.konsfordelning.{$sex}", $value);
+            //self::incValue($this->aggregated, "anstallda.total.{$year}.konsfordelning.{$sex}", $value);
 
+            /*
             self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.alla", $value);
             self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.konsfordelning.{$sex}", $value);*/
         }
