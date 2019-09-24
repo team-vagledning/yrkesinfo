@@ -48,6 +48,13 @@ trait ScbFormatter
         '1530' => 'offentlig', //'statligt ägda företag och organisationer',
         '1540' => 'offentlig', //'kommunalt ägda företag och organisationer',
         '1560' => 'privat', //'övriga organisationer',
+        '1' => 'offentlig',
+        '1-3' => 'offentlig',
+        '2' => 'offentlig',
+        '3' => 'offentlig',
+        '4-5' => 'privat',
+        '4' => 'privat',
+        '5' => 'privat',
         'US' => 'saknas', //'uppgift saknas',
     ];
 

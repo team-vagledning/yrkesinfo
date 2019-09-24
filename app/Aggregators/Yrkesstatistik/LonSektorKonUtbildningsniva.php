@@ -29,7 +29,14 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
 
             $year = self::getYear($row);
             $sex = self::getSex($row);
+            $section = self::getSectionName($row);
             $utbildningsniva = self::getUtbildningsniva($row);
+
+            if (!in_array($section, ['samtliga'])) {
+                continue;
+            }
+
+            //dd($row);
 
             $value = data_get($row, 'values.0', 0);
             $value = self::value($value, 'viktat-medelvärde', "anstallda.utbildningsniva.{$utbildningsniva}.{$year}.alla");
