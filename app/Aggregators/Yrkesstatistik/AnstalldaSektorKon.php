@@ -20,6 +20,16 @@ class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggrega
         ];
     }
 
+    public function firstRun(Yrkesstatistik $yrkesstatistik)
+    {
+        // TODO: Implement firstRun() method.
+    }
+
+    public function lastRun(Yrkesstatistik $yrkesstatistik)
+    {
+        // TODO: Implement lastRun() method.
+    }
+
     public function run(Yrkesstatistik $yrkesstatistik)
     {
         $data = $yrkesstatistik->statistics['data'];

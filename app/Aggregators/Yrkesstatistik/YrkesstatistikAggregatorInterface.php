@@ -6,5 +6,7 @@ use App\Yrkesstatistik;
 
 interface YrkesstatistikAggregatorInterface
 {
-    public function run(Yrkesstatistik $yrkesstatistik);
+    public function firstRun(Yrkesstatistik $yrkesstatistik);
+    public function lastRun(Yrkesstatistik $yrkesstatistik);
+    //public function run(Yrkesstatistik $yrkesstatistik);
 }

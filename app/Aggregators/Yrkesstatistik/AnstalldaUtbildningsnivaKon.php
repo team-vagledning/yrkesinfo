@@ -21,6 +21,16 @@ class AnstalldaUtbildningsnivaKon extends BaseAggregator implements Yrkesstatist
         ];
     }
 
+    public function firstRun(Yrkesstatistik $yrkesstatistik)
+    {
+        // TODO: Implement firstRun() method.
+    }
+
+    public function lastRun(Yrkesstatistik $yrkesstatistik)
+    {
+        // TODO: Implement lastRun() method.
+    }
+
     public function run(Yrkesstatistik $yrkesstatistik)
     {
 
