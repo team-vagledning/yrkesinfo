@@ -43,6 +43,7 @@ class AnstalldaLanKon extends BaseAggregator implements YrkesstatistikAggregator
             $value = self::value($value, 'summera');
 
             self::incValue($this->aggregated, "anstallda.total.{$year}.alla", $value);
+
             self::incValue($this->aggregated, "anstallda.total.{$year}.konsfordelning.{$sex}", $value);
 
             self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.alla", $value);

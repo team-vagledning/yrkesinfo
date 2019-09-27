@@ -3,6 +3,7 @@
 namespace App\Aggregators\Yrkesstatistik;
 
 use App\Modules\Yrkesstatistik\Entry;
+use App\Modules\Yrkesstatistik\EntryFactory;
 use App\Yrkesstatistik;
 
 class LonSektorKonUtbildningsniva extends BaseAggregator implements YrkesstatistikAggregatorInterface
@@ -10,6 +11,12 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
     use ScbFormatter;
 
     public $aggregated = [];
+    public $factory;
+
+    public function __construct(EntryFactory $entryFactory)
+    {
+        $this->factory = $entryFactory->createFactory("Lön", ["Sektor", "Kön", "Utbildningsnivå", "År"]);
+    }
 
     public static function keys()
     {
@@ -35,13 +42,10 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
             $section = self::getSectionName($row);
             $utbildningsniva = self::getUtbildningsniva($row);
 
-            $entry = new Entry('Lön');
-
-            $entry->addKey('Sektor', $section);
-            $entry->addKey('Kön', $sex);
-            $entry->addKey('Utbilningsnivå', $utbildningsniva);
-            $entry->addKey('År', $year);
-            $entry->addValue(data_get($row, 'values.0', 0));
+            $entry = $this->factory->makeEntry(
+                [$section, $sex, $utbildningsniva, $year],
+                data_get($row, 'values.0', 0)
+            );
 
             $this->aggregated['entries'][] = $entry->toArray();
 
