@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Aggregators\Yrkesstatistik\YrkesomradeAggregator;
+use App\Modules\Yrkesstatistik\Collection;
 use App\Yrkesgrupp;
 use App\Yrkesstatistik;
 use App\YrkesstatistikAggregated;
@@ -41,30 +42,20 @@ class AggregateStatistics extends Command
      */
     public function handle()
     {
-        /**
-        foreach (Yrkesstatistik::latestPerSourceAndYrkesgrupp()->get() as $statistics) {
-            $aggregator = $statistics->source->aggregator;
-
-            if ($aggregator) {
-                app()->make($aggregator)->run($statistics);
-            }
-        }**/
-
         foreach (Yrkesgrupp::get() as $yrkesgrupp) {
             $yrkesstatistik = Yrkesstatistik::latestPerSourceAndYrkesgrupp($yrkesgrupp)->get();
+            $collection = new Collection();
 
             // First run
             foreach ($yrkesstatistik as $ys) {
-                $d = app()->make($ys->source->aggregator)->firstRun($ys);
+                app()->make($ys->source->aggregator)->firstRun($ys, $collection);
             }
 
-            dd(array_keys($d));
-
-            dd($d['lon']['entries'][0]);
+            dd($collection);
 
             // Last run
             foreach ($yrkesstatistik as $ys) {
-                app()->make($ys->source->aggregator)->lastRun($ys);
+                app()->make($ys->source->aggregator)->lastRun($ys, $collection);
             }
         }
     }

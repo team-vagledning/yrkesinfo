@@ -2,6 +2,7 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
+use App\Modules\Yrkesstatistik\Collection;
 use App\Modules\Yrkesstatistik\Entry;
 use App\Modules\Yrkesstatistik\EntryFactory;
 use App\Yrkesstatistik;
@@ -29,33 +30,29 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
         ];
     }
 
-    public function firstRun(Yrkesstatistik $yrkesstatistik)
+    public function firstRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         $data = $yrkesstatistik->statistics['data'];
 
-        $this->aggregated = ['entries' => []];
-
         foreach ($data as $row) {
-
-            $year = self::getYear($row);
-            $sex = self::getSex($row);
-            $section = self::getSectionName($row);
+            $year = self::getAr($row);
+            $sex = self::getKon($row);
+            $section = self::getSektionName($row);
             $utbildningsniva = self::getUtbildningsniva($row);
 
             $entry = $this->factory->makeEntry(
                 [$section, $sex, $utbildningsniva, $year],
-                data_get($row, 'values.0', 0)
+                data_get($row, 'values.0', 0),
+                "Total"
             );
 
-            $this->aggregated['entries'][] = $entry->toArray();
-
+            $collection->addEntry($entry);
         }
 
-        self::update($yrkesstatistik, $this->aggregated);
-        return $this->aggregated;
+        return true;
     }
 
-    public function lastRun(Yrkesstatistik $yrkesstatistik)
+    public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         dd("Andra");
     }
@@ -66,9 +63,9 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
 
         foreach ($data as $row) {
 
-            $year = self::getYear($row);
-            $sex = self::getSex($row);
-            $section = self::getSectionName($row);
+            $year = self::getAr($row);
+            $sex = self::getKon($row);
+            $section = self::getSektionName($row);
             $utbildningsniva = self::getUtbildningsniva($row);
 
             if (!in_array($section, ['samtliga'])) {

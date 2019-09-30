@@ -2,6 +2,7 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
+use App\Modules\Yrkesstatistik\Collection;
 use App\Yrkesstatistik;
 
 class AnstalldaUtbildningsnivaKon extends BaseAggregator implements YrkesstatistikAggregatorInterface
@@ -21,12 +22,12 @@ class AnstalldaUtbildningsnivaKon extends BaseAggregator implements Yrkesstatist
         ];
     }
 
-    public function firstRun(Yrkesstatistik $yrkesstatistik)
+    public function firstRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         // TODO: Implement firstRun() method.
     }
 
-    public function lastRun(Yrkesstatistik $yrkesstatistik)
+    public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         // TODO: Implement lastRun() method.
     }
@@ -37,8 +38,8 @@ class AnstalldaUtbildningsnivaKon extends BaseAggregator implements Yrkesstatist
         $data = $yrkesstatistik->statistics['data'];
 
         foreach ($data as $row) {
-            $year = self::getYear($row);
-            $sex = self::getSex($row);
+            $year = self::getAr($row);
+            $sex = self::getKon($row);
             $utbildningsniva = self::getUtbildningsniva($row);
 
             $value = data_get($row, 'values.0', 0);

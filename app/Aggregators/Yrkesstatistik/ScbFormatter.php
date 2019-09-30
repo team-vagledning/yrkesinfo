@@ -83,7 +83,7 @@ trait ScbFormatter
         return end(self::$regions[99]);
     }
 
-    public static function getSectionName($from)
+    public static function getSektionName($from)
     {
         $id = self::getKeyValue($from, self::getKey('SEKTOR'));
 
@@ -94,13 +94,13 @@ trait ScbFormatter
         return end(self::$sections);
     }
 
-    public static function getSex($from)
+    public static function getKon($from)
     {
         $value = self::getKeyValue($from, self::getKey('SEX'));
         return self::$SEXES[$value];
     }
 
-    public static function getYear($from)
+    public static function getAr($from)
     {
         return self::getKeyValue($from, self::getKey('YEAR'));
     }

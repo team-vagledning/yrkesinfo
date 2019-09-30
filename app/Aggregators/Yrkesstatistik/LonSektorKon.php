@@ -2,6 +2,7 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
+use App\Modules\Yrkesstatistik\Collection;
 use App\Yrkesstatistik;
 
 class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInterface
@@ -25,12 +26,12 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
         ];
     }
 
-    public function firstRun(Yrkesstatistik $yrkesstatistik)
+    public function firstRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         // TODO: Implement firstRun() method.
     }
 
-    public function lastRun(Yrkesstatistik $yrkesstatistik)
+    public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         // TODO: Implement lastRun() method.
     }
@@ -40,9 +41,9 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
         $data = $yrkesstatistik->statistics['data'];
 
         foreach ($data as $row) {
-            $sector = self::getSectionName($row);
-            $year = self::getYear($row);
-            $sex = self::getSex($row);
+            $sector = self::getSektionName($row);
+            $year = self::getAr($row);
+            $sex = self::getKon($row);
 
 
             // lon.total.2017.alla.medel

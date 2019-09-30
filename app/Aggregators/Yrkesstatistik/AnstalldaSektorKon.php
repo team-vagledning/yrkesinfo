@@ -2,6 +2,7 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
+use App\Modules\Yrkesstatistik\Collection;
 use App\Yrkesstatistik;
 
 class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInterface
@@ -20,12 +21,12 @@ class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggrega
         ];
     }
 
-    public function firstRun(Yrkesstatistik $yrkesstatistik)
+    public function firstRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         // TODO: Implement firstRun() method.
     }
 
-    public function lastRun(Yrkesstatistik $yrkesstatistik)
+    public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         // TODO: Implement lastRun() method.
     }
@@ -35,9 +36,9 @@ class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggrega
         $data = $yrkesstatistik->statistics['data'];
 
         foreach ($data as $row) {
-            $sector = self::getSectionName($row);
-            $year = self::getYear($row);
-            $sex = self::getSex($row);
+            $sector = self::getSektionName($row);
+            $year = self::getAr($row);
+            $sex = self::getKon($row);
 
             $value = data_get($row, 'values.0', 0);
             $value = self::value($value, 'summera');
