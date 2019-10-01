@@ -46,8 +46,8 @@ class AnstalldaLanKon extends BaseAggregator implements YrkesstatistikAggregator
 
             // Make for summing, for the whole country
             $summingEntry = $this->factory->findOrMakeEntry($collection, [
-                ScbFormatter::$regions['00'],
-                ScbFormatter::$sexes['1+2'],
+                ScbFormatter::$regioner['00'],
+                ScbFormatter::$kon['1+2'],
                 $year
             ]);
 

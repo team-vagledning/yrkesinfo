@@ -4,13 +4,13 @@ namespace App\Aggregators\Yrkesstatistik;
 
 trait ScbFormatter
 {
-    public static $sexes = [
+    public static $kon = [
         '1' => 'Man',
         '2' => 'Kvinna',
         '1+2' => 'Alla',
     ];
 
-    public static $regions = [
+    public static $regioner = [
         '00' => 'Riket',
         '01' => 'Stockholms län',
         '03' => 'Uppsala län',
@@ -36,18 +36,18 @@ trait ScbFormatter
         '99' => 'Län okänt',
     ];
 
-    public static $sections = [
-        '11' => 'statlig förvaltning',
-        '1110' => 'statliga affärsverk',
-        '1120' => 'primärkommunal förvaltning',
-        '1130' => 'landsting',
-        '15' => 'övriga offentliga institutioner',
-        '1510' => 'aktiebolag ej offentligt ägda',
-        '1520' => 'övriga företag ej offentligt ägda',
-        '1530' => 'statligt ägda företag och organisationer',
-        '1540' => 'kommunalt ägda företag och organisationer',
-        '1560' => 'övriga organisationer',
-        'US' => 'uppgift saknas',
+    public static $sektioner = [
+        '11' => 'statlig förvaltning', // Offentlig
+        '1110' => 'statliga affärsverk', // Offentlig
+        '1120' => 'primärkommunal förvaltning', // Offentlig
+        '1130' => 'landsting', // Offentlig
+        '15' => 'övriga offentliga institutioner', // Offentlig
+        '1510' => 'aktiebolag ej offentligt ägda', // Privat
+        '1520' => 'övriga företag ej offentligt ägda', // Privat
+        '1530' => 'statligt ägda företag och organisationer', // Offentlig
+        '1540' => 'kommunalt ägda företag och organisationer', // Offentlig
+        '1560' => 'övriga organisationer', // Privat
+        'US' => 'uppgift saknas', // Uppgift saknas
         /*
         '0' => 'Samtliga',
         '11' => 'Offentlig', //'statlig förvaltning',
@@ -89,28 +89,28 @@ trait ScbFormatter
     {
         $id = self::getKeyValue($from, self::getKey('REGION'));
 
-        if (array_key_exists($id, self::$regions)) {
-            return self::$regions[$id];
+        if (array_key_exists($id, self::$regioner)) {
+            return self::$regioner[$id];
         }
 
-        return end(self::$regions[99]);
+        return end(self::$regioner[99]);
     }
 
     public static function getSektionName($from)
     {
         $id = self::getKeyValue($from, self::getKey('SEKTOR'));
 
-        if (array_key_exists($id, self::$sections)) {
-            return self::$sections[$id];
+        if (array_key_exists($id, self::$sektioner)) {
+            return self::$sektioner[$id];
         }
 
-        return end(self::$sections);
+        return end(self::$sektioner);
     }
 
     public static function getKon($from)
     {
         $value = self::getKeyValue($from, self::getKey('SEX'));
-        return self::$sexes[$value];
+        return self::$kon[$value];
     }
 
     public static function getAr($from)

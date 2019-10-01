@@ -49,11 +49,11 @@ class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggrega
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Sektor", "Kön", "År"], ["?", "?", "?", "2017"]);
-
         $years = $collection->getUniqueKeyValuesByKeys(["Anställda", "Sektor", "Kön", "År"])['År'];
 
-        dd($years);
+        foreach ($years as $year) {
+            $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Sektor", "Kön", "År"], ["?", "?", "?", $year]);
+        }
 
     }
 
