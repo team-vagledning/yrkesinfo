@@ -10,7 +10,6 @@ class AnstalldaLanKon extends BaseAggregator implements YrkesstatistikAggregator
 {
     use ScbFormatter;
 
-    public $aggregated = [];
     public $factory;
 
     public function __construct(EntryFactory $entryFactory)
@@ -36,29 +35,34 @@ class AnstalldaLanKon extends BaseAggregator implements YrkesstatistikAggregator
             $region = self::getRegionName($row);
             $year = self::getAr($row);
             $sex = self::getKon($row);
+            $value = data_get($row, 'values.0', 0);
 
-            self::incValue($this->aggregated, "anstallda.total.{$year}.alla", $value);
-
-            self::incValue($this->aggregated, "anstallda.total.{$year}.konsfordelning.{$sex}", $value);
-
-            self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.alla", $value);
-            self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.konsfordelning.{$sex}", $value);
-
+            // Make entry from row
             $entry = $this->factory->makeEntry(
                 [$region, $sex, $year],
-                data_get($row, 'values.0', 0),
+                $value,
                 "Total"
             );
 
+            // Make for summing, for the whole country
+            $summingEntry = $this->factory->findOrMakeEntry($collection, [
+                ScbFormatter::$regions['00'],
+                ScbFormatter::$sexes['1+2'],
+                $year
+            ]);
+
+            // Update the sum
+            $summingEntry->setValue($summingEntry->getValue() + $value);
+
             $collection->addEntry($entry);
+            $collection->addEntry($summingEntry, true);
         }
     }
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        // TODO: Implement lastRun() method.
+        $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Län", "Kön", "År"], ["?", "?", "?", "2017"]);
 
-        $collection->findAllByKeys()
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)

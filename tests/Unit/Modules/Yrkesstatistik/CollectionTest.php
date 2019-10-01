@@ -39,6 +39,75 @@ class CollectionTest extends TestCase
         $this->assertInstanceOf(Entry::class, $searchedEntry);
     }
 
+    public function testFindByMultipleKeyValueOptions()
+    {
+        $collection = app(Collection::class);
+
+        $factory = app(EntryFactory::class)->createFactory("Lön", ["Sektion", "År"]);
+
+        $a1 = $factory->makeEntry(["A", 2000], 0, "Total");
+        $b1 = $factory->makeEntry(["B", 2000], 0, "Total");
+        $b2 = $factory->makeEntry(["B", 2001], 0, "Total");
+        $c1 = $factory->makeEntry(["C", 2001], 0, "Total");
+        $d1 = $factory->makeEntry(["D", 2002], 0, "Total");
+
+
+        $collection->addEntries([$a1, $b1, $b2, $c1, $d1]);
+
+        // One should still work
+        $e = $collection->findAllByKeysAndKeyValues(["Lön", "Sektion", "År"], ["A", 2000]);
+        $this->assertTrue(in_array($a1, $e));
+
+        // Try two
+        $e = $collection->findAllByKeysAndKeyValues(["Lön", "Sektion", "År"], [["A", "B"], 2000]);
+
+        $this->assertTrue(in_array($a1, $e));
+        $this->assertTrue(in_array($b1, $e));
+    }
+
+    public function testGetUniqueKeyValuesByKeys()
+    {
+        $collection = app(Collection::class);
+
+        $factory = app(EntryFactory::class)->createFactory("Lön", ["Sektion", "År"]);
+
+        $collection->addEntries([
+            $factory->makeEntry(["A", 2000], 0, "Total"),
+            $factory->makeEntry(["B", 2000], 0, "Total"),
+            $factory->makeEntry(["B", 2001], 0, "Total"),
+            $factory->makeEntry(["C", 2001], 0, "Total"),
+            $factory->makeEntry(["D", 2002], 0, "Total"),
+        ]);
+
+        $expected = [
+            "Lön" => ["base"],
+            "Sektion" => ["A", "B", "C", "D"],
+            "År" => [2000, 2001, 2002],
+        ];
+
+        $this->assertEquals($expected, $collection->getUniqueKeyValuesByKeys(["Lön", "Sektion", "År"]));
+    }
+
+    public function testPossibleKeyValuePairs()
+    {
+        $collection = app(Collection::class);
+
+        $keyValue = [["A", "B"], "2000", ["1", "2", "3"], ["Foo"]];
+
+        $possibleKeyValuePairs = [
+            ["A", "2000", "1", "Foo"],
+            ["A", "2000", "2", "Foo"],
+            ["A", "2000", "3", "Foo"],
+            ["B", "2000", "1", "Foo"],
+            ["B", "2000", "2", "Foo"],
+            ["B", "2000", "3", "Foo"],
+        ];
+
+        $results = $collection->possibleKeyValuePairs($keyValue);
+
+        $this->assertEquals($possibleKeyValuePairs, $results);
+    }
+
     public function testFindingByKeyAndKeyValues()
     {
         $collection = app(Collection::class);
@@ -53,6 +122,31 @@ class CollectionTest extends TestCase
         $entry = $collection->findFirstByKeysAndKeyValues(["Anställda", "Sektion", "År"], ["Privat", "2019"]);
 
         $this->assertEquals(500, $entry->getValue());
+    }
+
+    public function testFindingByKeyAndKeyValuesWithUnknowns()
+    {
+        $collection = app(Collection::class);
+        $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
+
+        $collection->addEntries([
+            $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total"),
+            $entryFactory->makeEntry(["Offentligt", "2018"], 900, "Total"),
+            $entryFactory->makeEntry(["Offentligt", "2017"], 800, "Total"),
+        ]);
+
+        $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Sektion", "År"], ["?", "2018"]);
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(900, $entries[0]->getValue());
+    }
+
+    public function testRemovingUnknownsFromArray()
+    {
+        $testArray = ["A", "B", "?", "D", "?", "F"];
+        $expectedArray = ["A", "B", "D", "F"];
+
+        $this->assertEquals($expectedArray, app(Collection::class)->removeUnknownKeys($testArray));
     }
 
     public function testUpdatingEntry()
@@ -75,5 +169,71 @@ class CollectionTest extends TestCase
         // Find the same entry, and check value
         $_entry = $collection->findFirstByKeysAndKeyValues(["Anställda", "Sektion", "År"], ["Privat", "2019"]);
         $this->assertEquals(1200, $_entry->getValue());
+    }
+
+    public function testReplacingEntry()
+    {
+        $collection = app(Collection::class);
+        $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
+
+        $firstEntry = $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total");
+        $secondEntry = $entryFactory->makeEntry(["Offentligt", "2019"], 1500, "Total");
+
+        $collection->addEntry($firstEntry, true);
+
+        $entry = $collection->findFirstByKeysAndKeyValues(["Anställda", "Sektion", "År"], ["Offentligt", "2019"]);
+        $this->assertEquals(1000, $entry->getValue());
+
+        $collection->addEntry($secondEntry, true);
+
+        $entry = $collection->findFirstByKeysAndKeyValues(["Anställda", "Sektion", "År"], ["Offentligt", "2019"]);
+        $this->assertEquals(1500, $entry->getValue());
+    }
+
+    public function testSumEntries()
+    {
+        $collection = app(Collection::class);
+        $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
+
+        $collection->addEntries([
+            $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total"),
+            $entryFactory->makeEntry(["Privat", "2019"], 500, "Total"),
+            $entryFactory->makeEntry(["Okänt", "2019"], 600, "Total"),
+        ]);
+
+        $entries = $collection->findAllByKeys(["Anställda", "Sektion", "År"]);
+
+        $this->assertEquals(2100, $collection->sumEntries($entries));
+    }
+
+    public function testToArray()
+    {
+        $collection = app(Collection::class);
+        $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
+
+        $collection->addEntries([
+            $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total"),
+        ]);
+
+        $this->assertIsArray($collection->toArray());
+        $this->arrayHasKey("entries");
+        $this->assertCount(1, $collection->toArray()['entries']);
+    }
+
+    public function testInitializeFromArray()
+    {
+        $collection = (new Collection())->initializeFromArray([
+            'entries' => [
+                [
+                    "keys" => ["Anställda", "Kön"],
+                    "keyValues" => ["base", "Man"],
+                    "value" => 1000,
+                    "valueType" => "Total",
+                ]
+            ]
+        ]);
+
+        $entry = $collection->findFirstByKeys(["Anställda", "Kön"]);
+        $this->assertEquals(1000, $entry->getValue());
     }
 }

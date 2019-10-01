@@ -42,6 +42,12 @@ class Entry implements Arrayable
         ];
     }
 
+    public function replace(Entry $withEntry) : self
+    {
+        $this->setValue($withEntry->getValue());
+        return $this;
+    }
+
     public function getKeys() : array
     {
         return $this->keys;

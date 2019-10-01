@@ -3,13 +3,19 @@
 namespace App\Aggregators\Yrkesstatistik;
 
 use App\Modules\Yrkesstatistik\Collection;
+use App\Modules\Yrkesstatistik\EntryFactory;
 use App\Yrkesstatistik;
 
 class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInterface
 {
     use ScbFormatter;
 
-    public $aggregated = [];
+    public $factory;
+
+    public function __construct(EntryFactory $entryFactory)
+    {
+        $this->factory = $entryFactory->createFactory("Anställda", ["Sektor", "Kön", "År"]);
+    }
 
     public static function keys()
     {
@@ -23,12 +29,32 @@ class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggrega
 
     public function firstRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        // TODO: Implement firstRun() method.
+        $data = $yrkesstatistik->statistics['data'];
+
+        foreach ($data as $row) {
+            $sector = self::getSektionName($row);
+            $year = self::getAr($row);
+            $sex = self::getKon($row);
+            $value = data_get($row, 'values.0', 0);
+
+            $entry = $this->factory->makeEntry(
+                [$sector, $sex, $year],
+                $value,
+                "Total"
+            );
+
+            $collection->addEntry($entry);
+        }
     }
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        // TODO: Implement lastRun() method.
+        $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Sektor", "Kön", "År"], ["?", "?", "?", "2017"]);
+
+        $years = $collection->getUniqueKeyValuesByKeys(["Anställda", "Sektor", "Kön", "År"])['År'];
+
+        dd($years);
+
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)

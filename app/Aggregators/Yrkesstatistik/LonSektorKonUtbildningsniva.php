@@ -54,7 +54,7 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        dd("Andra");
+
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)

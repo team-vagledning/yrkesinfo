@@ -51,12 +51,31 @@ class AggregateStatistics extends Command
                 app()->make($ys->source->aggregator)->firstRun($ys, $collection);
             }
 
-            dd($collection);
+            //dd($collection);
 
             // Last run
             foreach ($yrkesstatistik as $ys) {
                 app()->make($ys->source->aggregator)->lastRun($ys, $collection);
             }
+
+
+            // Update
+            self::update($yrkesgrupp, $collection->toArray());
+
+
+            //
+            dd();
         }
+    }
+
+    public static function update(Yrkesgrupp $yrkesgrupp, $aggregation)
+    {
+        $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->firstOrCreate([], [
+            'statistics' => []
+        ]);
+
+        $aggregated->update([
+            'statistics' => array_replace_recursive($aggregated->statistics, $aggregation)
+        ]);
     }
 }
