@@ -47,6 +47,16 @@ trait ScbFormatter
         '1530' => 'Offentlig', // Offentlig
         '1540' => 'Offentlig', // Offentlig
         '1560' => 'Privat', // Privat
+
+        '0' => 'Samtliga', // Samtliga
+        '1' => 'Offentlig', // Offentlig sektor
+        '1-3' => 'Offentlig', // Offentlig
+        '2' => 'Offentlig', // Kommunal sektor
+        '3' => 'Offentlig', // Landstingssektorn
+        '4-5' => 'Privat', // Privat sektor
+        '4' => 'Privat', // Privatanställda arbetare
+        '5' => 'Privat', // Privatanställda tjänstemän
+
         'US' => 'Uppgift saknas', // Uppgift saknas
     ];
 
@@ -62,27 +72,15 @@ trait ScbFormatter
         '1540' => 'Kommunalt ägda företag och organisationer', // Offentlig
         '1560' => 'Övriga organisationer', // Privat
         'US' => 'Uppgift saknas', // Uppgift saknas
-        /*
+
         '0' => 'Samtliga',
-        '11' => 'Offentlig', //'statlig förvaltning',
-        '1110' => 'Offentlig', //'statliga affärsverk',
-        '1120' => 'Offentlig', //'primärkommunal förvaltning',
-        '1130' => 'Offentlig', //'landsting',
-        '15' => 'Offentlig', //'övriga offentliga institutioner',
-        '1510' => 'Privat', //'aktiebolag ej offentligt ägda',
-        '1520' => 'Privat', //'övriga företag ej offentligt ägda',
-        '1530' => 'Offentlig', //'statligt ägda företag och organisationer',
-        '1540' => 'Offentlig', //'kommunalt ägda företag och organisationer',
-        '1560' => 'Privat', //'övriga organisationer',
-        '1' => 'Offentlig',
+        '1' => 'Offentlig sektor',
         '1-3' => 'Offentlig',
-        '2' => 'Offentlig',
-        '3' => 'Offentlig',
-        '4-5' => 'Privat',
-        '4' => 'Privat',
-        '5' => 'Privat',
-        'US' => 'Saknas', //'uppgift saknas',
-        */
+        '2' => 'Kommunal sektor',
+        '3' => 'Landstingssektorn',
+        '4-5' => 'Privat sektor',
+        '4' => 'Privatanställda arbetare',
+        '5' => 'Privatanställda tjänstemän',
     ];
 
     public static $utbildningsniva = [

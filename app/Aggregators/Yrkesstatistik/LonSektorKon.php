@@ -37,16 +37,11 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
 
         foreach ($data as $row) {
             $sector = self::getSektionName($row);
-            $simpleSector = self::getSektionName($row, true);
             $year = self::getAr($row);
             $sex = self::getKon($row);
             $value = data_get($row, 'values.' . self::AVERAGE, 0);
             $valuePercentile10 = data_get($row, 'values.' . self::PERCENTILE_10, 0);
             $valuePercentile90 = data_get($row, 'values.' . self::PERCENTILE_90, 0);
-
-            if ($value == "..") {
-                $value = 0;
-            }
 
             // Make entries
             $entries = $this->factory->makeEntries([
@@ -55,44 +50,13 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
                 [[$sector, $sex, $year], $valuePercentile90, "MedelPercentile90"],
             ]);
 
-            // Sum all, on both sexes
-            $sumAll = $this->factory->findOrMakeEntry($collection, [
-                $simpleSector,
-                ScbFormatter::$kon['1+2'],
-                $year
-            ], "Medel");
-
-            // Update sum all
-            try {
-                $sumAll->setValue($sumAll->getValue() + $value);
-            } catch (\Exception $e) {
-                dd("Check your values!", $sumAll->getValue(), $value);
-            }
-
-
             $collection->addEntries($entries);
-            $collection->addEntry($sumAll, true);
         }
     }
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         // TODO: Kolla hur datan kommer från SCB... de verkar redan räknat ut totalen etc
-        $years = $collection->getUniqueKeyValuesByKeys(['År'])['År'];
-
-        // (Män Lön * Män tot) + (Kvinnor * Kvinnor tot) / Tot
-
-        foreach ($years as $year) {
-            $lon = $collection->findAllByKeysAndKeyValues(
-                ["Lön", "Sektor", "Kön", "År"],
-                ["?", "Alla", $year],
-                "Medel"
-            );
-
-            print_r($lonMan);
-        }
-
-        dd();
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)
