@@ -67,7 +67,7 @@ class Collection implements Arrayable
         return $results;
     }
 
-    public function findAllByKeyValues(array $keyValues, array $entries = null) : array
+    public function findAllByKeyValues(array $keyValues, array $entries = null, $valueType = false) : array
     {
         $results = [];
 
@@ -78,7 +78,13 @@ class Collection implements Arrayable
         foreach ($entries as $entry) {
             foreach ($this->possibleKeyValuePairs($keyValues) as $keyValuePair) {
                 if (empty(array_diff(self::removeUnknownKeys($keyValuePair), $entry->getKeyValues()))) {
-                    $results[] = $entry;
+                    if ($valueType) {
+                        if ($valueType == $entry->getValueType()) {
+                            $results[] = $entry;
+                        }
+                    } else {
+                        $results[] = $entry;
+                    }
                 }
             }
         }
@@ -108,11 +114,12 @@ class Collection implements Arrayable
     /**
      * @param array $keys
      * @param array $keyValues
+     * @param bool|mixed $valueType
      * @return bool|Entry
      */
-    public function findFirstByKeysAndKeyValues(array $keys, array $keyValues)
+    public function findFirstByKeysAndKeyValues(array $keys, array $keyValues, $valueType = false)
     {
-        $entries = $this->findAllByKeysAndKeyValues($keys, $keyValues);
+        $entries = $this->findAllByKeysAndKeyValues($keys, $keyValues, $valueType);
 
         if (count($entries)) {
             return $entries[0];
@@ -121,10 +128,10 @@ class Collection implements Arrayable
         return false;
     }
 
-    public function findAllByKeysAndKeyValues(array $keys, array $keyValues) : array
+    public function findAllByKeysAndKeyValues(array $keys, array $keyValues, $valueType = false) : array
     {
         $entries = $this->findAllByKeys($keys);
-        $entries = $this->findAllByKeyValues($keyValues, $entries);
+        $entries = $this->findAllByKeyValues($keyValues, $entries, $valueType);
 
         return $entries;
     }

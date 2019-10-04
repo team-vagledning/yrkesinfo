@@ -14,8 +14,8 @@ class EntryTest extends TestCase
     {
         $factory = app(EntryFactory::class)->createFactory("Lön", ["Kön", "Utbildningnivå", "År"]);
 
-        $firstEntry = $factory->makeEntry(["Man", "Gymnasieutbildning", "2018"], 10, "Total");
-        $secondEntry = $factory->makeEntry(["Kvinna", "Högskola", "2019"], 20, "Total");
+        $firstEntry = $factory->makeEntry(["Man", "Gymnasieutbildning", "2018"], "Total", 10);
+        $secondEntry = $factory->makeEntry(["Kvinna", "Högskola", "2019"], "Total", 20);
 
         $this->assertEquals("Gymnasieutbildning", $firstEntry->getKeyValue("Utbildningnivå"));
         $this->assertEquals("Högskola", $secondEntry->getKeyValue("Utbildningnivå"));

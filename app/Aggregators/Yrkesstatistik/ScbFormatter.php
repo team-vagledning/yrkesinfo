@@ -36,18 +36,32 @@ trait ScbFormatter
         '99' => 'Län okänt',
     ];
 
+    public static $simpleSektioner = [
+        '11' => 'Offentlig', // Offentlig
+        '1110' => 'Offentlig', // Offentlig
+        '1120' => 'Offentlig', // Offentlig
+        '1130' => 'Offentlig', // Offentlig
+        '15' => 'Offentlig', // Offentlig
+        '1510' => 'Privat', // Privat
+        '1520' => 'Privat', // Privat
+        '1530' => 'Offentlig', // Offentlig
+        '1540' => 'Offentlig', // Offentlig
+        '1560' => 'Privat', // Privat
+        'US' => 'Uppgift saknas', // Uppgift saknas
+    ];
+
     public static $sektioner = [
-        '11' => 'statlig förvaltning', // Offentlig
-        '1110' => 'statliga affärsverk', // Offentlig
-        '1120' => 'primärkommunal förvaltning', // Offentlig
-        '1130' => 'landsting', // Offentlig
-        '15' => 'övriga offentliga institutioner', // Offentlig
-        '1510' => 'aktiebolag ej offentligt ägda', // Privat
-        '1520' => 'övriga företag ej offentligt ägda', // Privat
-        '1530' => 'statligt ägda företag och organisationer', // Offentlig
-        '1540' => 'kommunalt ägda företag och organisationer', // Offentlig
-        '1560' => 'övriga organisationer', // Privat
-        'US' => 'uppgift saknas', // Uppgift saknas
+        '11' => 'Statlig förvaltning', // Offentlig
+        '1110' => 'Statliga affärsverk', // Offentlig
+        '1120' => 'Primärkommunal förvaltning', // Offentlig
+        '1130' => 'Landsting', // Offentlig
+        '15' => 'Övriga offentliga institutioner', // Offentlig
+        '1510' => 'Aktiebolag ej offentligt ägda', // Privat
+        '1520' => 'Övriga företag ej offentligt ägda', // Privat
+        '1530' => 'Statligt ägda företag och organisationer', // Offentlig
+        '1540' => 'Kommunalt ägda företag och organisationer', // Offentlig
+        '1560' => 'Övriga organisationer', // Privat
+        'US' => 'Uppgift saknas', // Uppgift saknas
         /*
         '0' => 'Samtliga',
         '11' => 'Offentlig', //'statlig förvaltning',
@@ -96,11 +110,11 @@ trait ScbFormatter
         return end(self::$regioner[99]);
     }
 
-    public static function getSektionName($from)
+    public static function getSektionName($from, $simple = false)
     {
         $id = self::getKeyValue($from, self::getKey('SEKTOR'));
 
-        if (array_key_exists($id, self::$sektioner)) {
+        if (array_key_exists($id, $simple ? self::$simpleSektioner : self::$sektioner)) {
             return self::$sektioner[$id];
         }
 

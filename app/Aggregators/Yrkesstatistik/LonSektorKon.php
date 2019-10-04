@@ -3,18 +3,23 @@
 namespace App\Aggregators\Yrkesstatistik;
 
 use App\Modules\Yrkesstatistik\Collection;
+use App\Modules\Yrkesstatistik\EntryFactory;
 use App\Yrkesstatistik;
 
 class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInterface
 {
     use ScbFormatter;
 
-    const AVARAGE = 0;
+    const AVERAGE = 0;
     const PERCENTILE_10 = 1;
     const PERCENTILE_90 = 2;
 
+    public $factory;
 
-    public $aggregated = [];
+    public function __construct(EntryFactory $entryFactory)
+    {
+        $this->factory = $entryFactory->createFactory("Lön", ["Sektor", "Kön", "År"]);
+    }
 
     public static function keys()
     {
@@ -28,12 +33,66 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
 
     public function firstRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        // TODO: Implement firstRun() method.
+        $data = $yrkesstatistik->statistics['data'];
+
+        foreach ($data as $row) {
+            $sector = self::getSektionName($row);
+            $simpleSector = self::getSektionName($row, true);
+            $year = self::getAr($row);
+            $sex = self::getKon($row);
+            $value = data_get($row, 'values.' . self::AVERAGE, 0);
+            $valuePercentile10 = data_get($row, 'values.' . self::PERCENTILE_10, 0);
+            $valuePercentile90 = data_get($row, 'values.' . self::PERCENTILE_90, 0);
+
+            if ($value == "..") {
+                $value = 0;
+            }
+
+            // Make entries
+            $entries = $this->factory->makeEntries([
+                [[$sector, $sex, $year], $value, "Medel"],
+                [[$sector, $sex, $year], $valuePercentile10, "MedelPercentile10"],
+                [[$sector, $sex, $year], $valuePercentile90, "MedelPercentile90"],
+            ]);
+
+            // Sum all, on both sexes
+            $sumAll = $this->factory->findOrMakeEntry($collection, [
+                $simpleSector,
+                ScbFormatter::$kon['1+2'],
+                $year
+            ], "Medel");
+
+            // Update sum all
+            try {
+                $sumAll->setValue($sumAll->getValue() + $value);
+            } catch (\Exception $e) {
+                dd("Check your values!", $sumAll->getValue(), $value);
+            }
+
+
+            $collection->addEntries($entries);
+            $collection->addEntry($sumAll, true);
+        }
     }
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        // TODO: Implement lastRun() method.
+        // TODO: Kolla hur datan kommer från SCB... de verkar redan räknat ut totalen etc
+        $years = $collection->getUniqueKeyValuesByKeys(['År'])['År'];
+
+        // (Män Lön * Män tot) + (Kvinnor * Kvinnor tot) / Tot
+
+        foreach ($years as $year) {
+            $lon = $collection->findAllByKeysAndKeyValues(
+                ["Lön", "Sektor", "Kön", "År"],
+                ["?", "Alla", $year],
+                "Medel"
+            );
+
+            print_r($lonMan);
+        }
+
+        dd();
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)
@@ -45,7 +104,6 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
             $year = self::getAr($row);
             $sex = self::getKon($row);
 
-
             // lon.total.2017.alla.medel
             // lon.total.2017.alla.10-percentilen
             // {
@@ -55,7 +113,7 @@ class LonSektorKon extends BaseAggregator implements YrkesstatistikAggregatorInt
             //      mot: "anstallda.total.2017.alla"
             // }
 
-            $avarageSalary = data_get($row, 'values.' . self::AVARAGE, 0);
+            $avarageSalary = data_get($row, 'values.' . self::AVERAGE, 0);
             $avarageSalary = self::value($avarageSalary, 'viktat-medelvärde', "anstallda.total.{$year}");
 
             $avarageSalaryPercentile10 = data_get($row, 'values.' . self::PERCENTILE_10, 0);

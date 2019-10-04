@@ -25,9 +25,9 @@ class CollectionTest extends TestCase
         $entryFactory2->createFactory("Lön", ["Utbildningsnivå", "År"]);
 
         $collection->addEntries([
-            $entryFactory1->makeEntry(["Man", 2000], 10, "Total"),
-            $entryFactory1->makeEntry(["Kvinna", 2001], 10, "Total"),
-            $entryFactory2->makeEntry(["Gymnasiet", 2000], 10, "Total"),
+            $entryFactory1->makeEntry(["Man", 2000], "Total", 10),
+            $entryFactory1->makeEntry(["Kvinna", 2001], "Total", 10),
+            $entryFactory2->makeEntry(["Gymnasiet", 2000], "Total", 10),
         ]);
 
         $queryKeys = ["Lön", "Kön", "År"];
@@ -45,11 +45,11 @@ class CollectionTest extends TestCase
 
         $factory = app(EntryFactory::class)->createFactory("Lön", ["Sektion", "År"]);
 
-        $a1 = $factory->makeEntry(["A", 2000], 0, "Total");
-        $b1 = $factory->makeEntry(["B", 2000], 0, "Total");
-        $b2 = $factory->makeEntry(["B", 2001], 0, "Total");
-        $c1 = $factory->makeEntry(["C", 2001], 0, "Total");
-        $d1 = $factory->makeEntry(["D", 2002], 0, "Total");
+        $a1 = $factory->makeEntry(["A", 2000], "Total", 0);
+        $b1 = $factory->makeEntry(["B", 2000], "Total", 0);
+        $b2 = $factory->makeEntry(["B", 2001], "Total", 0);
+        $c1 = $factory->makeEntry(["C", 2001], "Total", 0);
+        $d1 = $factory->makeEntry(["D", 2002], "Total", 0);
 
 
         $collection->addEntries([$a1, $b1, $b2, $c1, $d1]);
@@ -72,11 +72,11 @@ class CollectionTest extends TestCase
         $factory = app(EntryFactory::class)->createFactory("Lön", ["Sektion", "År"]);
 
         $collection->addEntries([
-            $factory->makeEntry(["A", 2000], 0, "Total"),
-            $factory->makeEntry(["B", 2000], 0, "Total"),
-            $factory->makeEntry(["B", 2001], 0, "Total"),
-            $factory->makeEntry(["C", 2001], 0, "Total"),
-            $factory->makeEntry(["D", 2002], 0, "Total"),
+            $factory->makeEntry(["A", 2000], "Total", 0),
+            $factory->makeEntry(["B", 2000], "Total", 0),
+            $factory->makeEntry(["B", 2001], "Total", 0),
+            $factory->makeEntry(["C", 2001], "Total", 0),
+            $factory->makeEntry(["D", 2002], "Total", 0),
         ]);
 
         $expected = [
@@ -114,12 +114,28 @@ class CollectionTest extends TestCase
         $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
 
         $collection->addEntries([
-            $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total"),
-            $entryFactory->makeEntry(["Privat", "2019"], 500, "Total"),
-            $entryFactory->makeEntry(["Okänt", "2019"], 600, "Total"),
+            $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1000),
+            $entryFactory->makeEntry(["Privat", "2019"], "Total", 500),
+            $entryFactory->makeEntry(["Okänt", "2019"], "Total", 600),
         ]);
 
         $entry = $collection->findFirstByKeysAndKeyValues(["Anställda", "Sektion", "År"], ["Privat", "2019"]);
+
+        $this->assertEquals(500, $entry->getValue());
+    }
+
+    public function testFindingByKeyAndKeyValuesAndValueType()
+    {
+        $collection = app(Collection::class);
+        $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
+
+        $collection->addEntries([
+            $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1000),
+            $entryFactory->makeEntry(["Privat", "2019"], "Medel", 500),
+            $entryFactory->makeEntry(["Okänt", "2019"], "Total", 600),
+        ]);
+
+        $entry = $collection->findFirstByKeysAndKeyValues(["Anställda", "Sektion", "År"], ["?", "?"], "Medel");
 
         $this->assertEquals(500, $entry->getValue());
     }
@@ -130,9 +146,9 @@ class CollectionTest extends TestCase
         $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
 
         $collection->addEntries([
-            $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total"),
-            $entryFactory->makeEntry(["Offentligt", "2018"], 900, "Total"),
-            $entryFactory->makeEntry(["Offentligt", "2017"], 800, "Total"),
+            $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1000),
+            $entryFactory->makeEntry(["Offentligt", "2018"], "Total", 900),
+            $entryFactory->makeEntry(["Offentligt", "2017"], "Total", 800),
         ]);
 
         $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Sektion", "År"], ["?", "2018"]);
@@ -155,9 +171,9 @@ class CollectionTest extends TestCase
         $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
 
         $collection->addEntries([
-            $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total"),
-            $entryFactory->makeEntry(["Privat", "2019"], 500, "Total"),
-            $entryFactory->makeEntry(["Okänt", "2019"], 600, "Total"),
+            $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1000),
+            $entryFactory->makeEntry(["Privat", "2019"], "Total", 500),
+            $entryFactory->makeEntry(["Okänt", "2019"], "Total", 600),
         ]);
 
         // Find a specific entry
@@ -176,8 +192,8 @@ class CollectionTest extends TestCase
         $collection = app(Collection::class);
         $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
 
-        $firstEntry = $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total");
-        $secondEntry = $entryFactory->makeEntry(["Offentligt", "2019"], 1500, "Total");
+        $firstEntry = $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1000);
+        $secondEntry = $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1500);
 
         $collection->addEntry($firstEntry, true);
 
@@ -196,9 +212,9 @@ class CollectionTest extends TestCase
         $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
 
         $collection->addEntries([
-            $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total"),
-            $entryFactory->makeEntry(["Privat", "2019"], 500, "Total"),
-            $entryFactory->makeEntry(["Okänt", "2019"], 600, "Total"),
+            $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1000),
+            $entryFactory->makeEntry(["Privat", "2019"], "Total", 500),
+            $entryFactory->makeEntry(["Okänt", "2019"], "Total", 600),
         ]);
 
         $entries = $collection->findAllByKeys(["Anställda", "Sektion", "År"]);
@@ -212,7 +228,7 @@ class CollectionTest extends TestCase
         $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
 
         $collection->addEntries([
-            $entryFactory->makeEntry(["Offentligt", "2019"], 1000, "Total"),
+            $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1000),
         ]);
 
         $this->assertIsArray($collection->toArray());

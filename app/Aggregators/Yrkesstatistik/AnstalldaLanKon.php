@@ -39,30 +39,36 @@ class AnstalldaLanKon extends BaseAggregator implements YrkesstatistikAggregator
 
             // Make entry from row
             $entry = $this->factory->makeEntry(
-                [$region, $sex, $year],
-                $value,
-                "Total"
+                [$region, $sex, $year], "Total", $value
             );
 
-            // Make for summing, for the whole country
-            $summingEntry = $this->factory->findOrMakeEntry($collection, [
+            // Sum for the whole country
+            $sumWholeCountry = $this->factory->findOrMakeEntry($collection, [
                 ScbFormatter::$regioner['00'],
                 ScbFormatter::$kon['1+2'],
                 $year
             ]);
 
+            // Sum for region, both sexes
+            $sumRegion = $this->factory->findOrMakeEntry($collection, [
+                $region,
+                ScbFormatter::$kon['1+2'],
+                $year
+            ]);
+
             // Update the sum
-            $summingEntry->setValue($summingEntry->getValue() + $value);
+            $sumWholeCountry->setValue($sumWholeCountry->getValue() + $value);
+            $sumRegion->setValue($sumRegion->getValue() + $value);
 
             $collection->addEntry($entry);
-            $collection->addEntry($summingEntry, true);
+            $collection->addEntry($sumWholeCountry, true);
+            $collection->addEntry($sumRegion, true);
         }
     }
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
         $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Län", "Kön", "År"], ["?", "?", "?", "2017"]);
-
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)

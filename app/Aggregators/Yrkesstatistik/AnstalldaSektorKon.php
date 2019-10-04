@@ -38,23 +38,29 @@ class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggrega
             $value = data_get($row, 'values.0', 0);
 
             $entry = $this->factory->makeEntry(
-                [$sector, $sex, $year],
-                $value,
-                "Total"
+                [$sector, $sex, $year], "Total", $value
             );
 
+            // Sum for both sexes
+            $sumSexes = $this->factory->findOrMakeEntry($collection, [
+                $sector,
+                ScbFormatter::$kon['1+2'],
+                $year
+            ]);
+
+            // Update the sum
+            $sumSexes->setValue($sumSexes->getValue() + $value);
+
             $collection->addEntry($entry);
+            $collection->addEntry($sumSexes, true);
         }
     }
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        $years = $collection->getUniqueKeyValuesByKeys(["Anställda", "Sektor", "Kön", "År"])['År'];
+        //$years = $collection->getUniqueKeyValuesByKeys(["Anställda", "Sektor", "Kön", "År"])['År'];
 
-        foreach ($years as $year) {
-            $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Sektor", "Kön", "År"], ["?", "?", "?", $year]);
-        }
-
+        // TODO: Aggregera till Offentlig och Privat
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)

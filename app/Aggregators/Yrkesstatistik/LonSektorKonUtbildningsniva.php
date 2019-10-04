@@ -41,9 +41,7 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
             $utbildningsniva = self::getUtbildningsniva($row);
 
             $entry = $this->factory->makeEntry(
-                [$section, $sex, $utbildningsniva, $year],
-                data_get($row, 'values.0', 0),
-                "Total"
+                [$section, $sex, $utbildningsniva, $year], "Total", data_get($row, 'values.0', 0)
             );
 
             $collection->addEntry($entry);

@@ -15,25 +15,37 @@ class EntryFactory
         return $this;
     }
 
-    public function makeEntry(array $keyValues, $dataValue, $dataValueType) : Entry
+    public function makeEntry(array $keyValues, $dataValueType, $dataValue) : Entry
     {
         // Make room for the base, should always be the first key
         array_unshift($keyValues, "base");
 
-        return (new Entry())->initialize($this->keys, $keyValues, $dataValue, $dataValueType);
+        return (new Entry())->initialize($this->keys, $keyValues, $dataValueType, $dataValue);
+    }
+
+    public function makeEntries(array $values) : array
+    {
+        $entries = [];
+
+        foreach ($values as $value) {
+            [$keyValues, $dataValue, $dataValueType] = $value;
+            $entries[] = $this->makeEntry($keyValues, $dataValueType, $dataValue);
+        }
+
+        return $entries;
     }
 
     public function findOrMakeEntry(
         Collection $collection,
         array $keyValues,
-        $dataValue = 0,
-        $dataValueType = 'Total'
+        $dataValueType = 'Total',
+        $dataValue = 0
     ) : Entry {
 
-        if ($entry = $collection->findFirstByKeysAndKeyValues($this->keys, $keyValues)) {
+        if ($entry = $collection->findFirstByKeysAndKeyValues($this->keys, $keyValues, $dataValueType)) {
             return $entry;
         }
 
-        return $this->makeEntry($keyValues, $dataValue, $dataValueType);
+        return $this->makeEntry($keyValues, $dataValueType, $dataValue);
     }
 }

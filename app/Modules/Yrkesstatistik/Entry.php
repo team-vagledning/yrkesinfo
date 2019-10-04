@@ -12,7 +12,7 @@ class Entry implements Arrayable
     protected $value;
     protected $valueType;
 
-    public function initialize($keys, $keyValues, $value, $valueType) : self
+    public function initialize($keys, $keyValues, $valueType, $value) : self
     {
         $this->keys = $keys;
         $this->keyValues = $keyValues;
@@ -27,8 +27,8 @@ class Entry implements Arrayable
         return $this->initialize(
             $fromArray['keys'],
             $fromArray['keyValues'],
-            $fromArray['value'],
-            $fromArray['valueType']
+            $fromArray['valueType'],
+            $fromArray['value']
         );
     }
 
@@ -60,12 +60,22 @@ class Entry implements Arrayable
 
     public function getValue()
     {
+        // .. in SCB is an unknown value, return 0
+        if ($this->value == "..") {
+            return 0;
+        }
+
         return $this->value;
     }
 
     public function setValue($value)
     {
         $this->value = $value;
+    }
+
+    public function getValueType()
+    {
+        return $this->valueType;
     }
 
     public function getKeyValue($key)
