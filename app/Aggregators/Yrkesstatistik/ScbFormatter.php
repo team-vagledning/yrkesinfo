@@ -83,7 +83,7 @@ trait ScbFormatter
         '5' => 'Privatanställda tjänstemän',
     ];
 
-    public static $utbildningsniva = [
+    /*public static $utbildningsniva = [
         '1' => 'Ingen gymnasieutbildning',
         '2' => 'Ingen gymnasieutbildning',
         '3' => 'Gymnasieutbildning',
@@ -95,7 +95,22 @@ trait ScbFormatter
         '9' => 'Eftergymnasial utbildning 3 år eller mer',
         'TOTALT' => 'Samtliga utbildningsnivåer',
         'US' => 'Uppgift saknas',
+    ];*/
+
+    public static $utbildningsniva = [
+        '1' => 'Förgymnasial utbildning kortare än 9 år',
+        '2' => 'Förgymnasial utbildning, 9 (10) år',
+        '3' => 'Gymnasial utbildning, högst 2 år',
+        '4' => 'Gymnasial utbildning, 3 år',
+        '5' => 'Eftergymnasial utbildning, mindre än 3 år',
+        '6' => 'Eftergymnasial utbildning, 3 år eller mer',
+        '7' => 'Forskarutbildning',
+        //'8' => 'Eftergymnasial utbildning 3 år eller mer',
+        //'9' => 'Eftergymnasial utbildning 3 år eller mer',
+        'TOTALT' => 'Samtliga utbildningsnivåer',
+        'US' => 'Uppgift saknas',
     ];
+
 
     public static function getRegionName($from)
     {
@@ -134,6 +149,11 @@ trait ScbFormatter
     {
         $value = self::getKeyValue($from, self::getKey('UTBILDNINGSNIVA'));
         return self::$utbildningsniva[$value];
+    }
+
+    public static function getAlder($from)
+    {
+        return self::getKeyValue($from, self::getKey('AGE'));
     }
 
     public static function getKey($name)

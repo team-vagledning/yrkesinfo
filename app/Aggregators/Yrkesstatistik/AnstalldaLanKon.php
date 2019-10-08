@@ -39,7 +39,9 @@ class AnstalldaLanKon extends BaseAggregator implements YrkesstatistikAggregator
 
             // Make entry from row
             $entry = $this->factory->makeEntry(
-                [$region, $sex, $year], "Total", $value
+                [$region, $sex, $year],
+                "Total",
+                $value
             );
 
             // Sum for the whole country
@@ -68,7 +70,7 @@ class AnstalldaLanKon extends BaseAggregator implements YrkesstatistikAggregator
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
-        $entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Län", "Kön", "År"], ["?", "?", "?", "2017"]);
+        //$entries = $collection->findAllByKeysAndKeyValues(["Anställda", "Län", "Kön", "År"], ["?", "?", "?", "2017"]);
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)

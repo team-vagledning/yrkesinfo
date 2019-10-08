@@ -68,6 +68,11 @@ class Entry implements Arrayable
         return $this->value;
     }
 
+    public function hasValidValue() : bool
+    {
+        return $this->value !== ".." ? true : false;
+    }
+
     public function setValue($value)
     {
         $this->value = $value;

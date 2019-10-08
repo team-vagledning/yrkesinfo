@@ -128,6 +128,12 @@ class Collection implements Arrayable
         return false;
     }
 
+    /**
+     * @param array $keys
+     * @param array $keyValues
+     * @param bool $valueType
+     * @return Entry[]
+     */
     public function findAllByKeysAndKeyValues(array $keys, array $keyValues, $valueType = false) : array
     {
         $entries = $this->findAllByKeys($keys);
@@ -157,15 +163,22 @@ class Collection implements Arrayable
         return $results;
     }
 
-    public function sumEntries(array $entries)
+    public static function sumEntries(array $entries)
     {
-        $sum = 0;
+        return array_sum(array_map(function (Entry $entry) {
+            return $entry->getValue();
+        }, $entries));
+    }
 
-        foreach ($entries as $entry) {
-            $sum += $entry->getValue();
-        }
-
-        return $sum;
+    /**
+     * @param array $entries
+     * @return Entry[]
+     */
+    public static function filterEntriesWithValidValue(array $entries)
+    {
+        return array_filter($entries, function (Entry $entry) {
+            return $entry->hasValidValue();
+        });
     }
 
     public function toArray()

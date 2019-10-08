@@ -11,7 +11,6 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
 {
     use ScbFormatter;
 
-    public $aggregated = [];
     public $factory;
 
     public function __construct(EntryFactory $entryFactory)
@@ -41,7 +40,9 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
             $utbildningsniva = self::getUtbildningsniva($row);
 
             $entry = $this->factory->makeEntry(
-                [$section, $sex, $utbildningsniva, $year], "Total", data_get($row, 'values.0', 0)
+                [$section, $sex, $utbildningsniva, $year],
+                "Total",
+                data_get($row, 'values.0', 0)
             );
 
             $collection->addEntry($entry);
@@ -52,7 +53,23 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
 
     public function lastRun(Yrkesstatistik $yrkesstatistik, Collection $collection)
     {
+        $entries = Collection::filterEntriesWithValidValue($collection->findAllByKeysAndKeyValues(
+            ["Lön", "Sektor", "Kön", "Utbildningsnivå", "År"],
+            ["Samtliga", "?", "Alla", "?"]
+        ));
 
+        dd($entries);
+
+        $e = $entries[6];
+
+        $anstallda = $collection->findAllByKeysAndKeyValues(
+            ["Anställda", "Utbildningsnivå", "Ålder", "Kön", "År"],
+            [$e->getKeyValue("Utbildningsnivå"), "?", "?", $e->getKeyValue("År")]
+        );
+
+        dd(Collection::filterEntriesWithValidValue($entries), $withValues);
+
+        dd($e, Collection::sumEntries($entries), $e->getKeyValue("Utbildningsnivå"), $e->getKeyValue("År"));
     }
 
     public function run(Yrkesstatistik $yrkesstatistik)

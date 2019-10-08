@@ -219,7 +219,23 @@ class CollectionTest extends TestCase
 
         $entries = $collection->findAllByKeys(["Anställda", "Sektion", "År"]);
 
-        $this->assertEquals(2100, $collection->sumEntries($entries));
+        $this->assertEquals(2100, Collection::sumEntries($entries));
+    }
+
+    public function testFilterEntriesWithValidValues()
+    {
+        $collection = app(Collection::class);
+        $entryFactory = app(EntryFactory::class)->createFactory("Anställda", ["Sektion", "År"]);
+
+        $collection->addEntries([
+            $entryFactory->makeEntry(["Offentligt", "2019"], "Total", 1000),
+            $entryFactory->makeEntry(["Privat", "2019"], "Total", ".."),
+            $entryFactory->makeEntry(["Okänt", "2019"], "Total", 600),
+        ]);
+
+        $entries = $collection->findAllByKeys(["Anställda", "Sektion", "År"]);
+
+        $this->assertCount(2, Collection::filterEntriesWithValidValue($entries));
     }
 
     public function testToArray()
