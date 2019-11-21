@@ -83,7 +83,7 @@ trait ScbFormatter
         '5' => 'Privatanställda tjänstemän',
     ];
 
-    /*public static $utbildningsniva = [
+    public static $simpleUtbildningsniva = [
         '1' => 'Ingen gymnasieutbildning',
         '2' => 'Ingen gymnasieutbildning',
         '3' => 'Gymnasieutbildning',
@@ -95,7 +95,7 @@ trait ScbFormatter
         '9' => 'Eftergymnasial utbildning 3 år eller mer',
         'TOTALT' => 'Samtliga utbildningsnivåer',
         'US' => 'Uppgift saknas',
-    ];*/
+    ];
 
     public static $utbildningsniva = [
         '1' => 'Förgymnasial utbildning kortare än 9 år',
@@ -110,6 +110,17 @@ trait ScbFormatter
         'TOTALT' => 'Samtliga utbildningsnivåer',
         'US' => 'Uppgift saknas',
     ];
+
+    public function getSimpleUtbildningnivaFromUtbildningsniva($utbildningsniva)
+    {
+        $id = array_search($utbildningsniva, self::$utbildningsniva);
+
+        if ($id === false) {
+            throw new \Exception("Tried to get Utbildningsnivå but failed, with: $utbildningsniva");
+        }
+
+        return self::$simpleUtbildningsniva[$id];
+    }
 
 
     public static function getRegionName($from)
@@ -134,6 +145,17 @@ trait ScbFormatter
         return end(self::$sektioner);
     }
 
+    public static function getUtbildningsniva($from, $simple = false)
+    {
+        $id = self::getKeyValue($from, self::getKey('UTBILDNINGSNIVA'));
+
+        if (array_key_exists($id, $simple ? self::$simpleUtbildningsniva : self::$utbildningsniva)) {
+            return self::$utbildningsniva[$id];
+        }
+
+        return end(self::$utbildningsniva);
+    }
+
     public static function getKon($from)
     {
         $value = self::getKeyValue($from, self::getKey('SEX'));
@@ -143,12 +165,6 @@ trait ScbFormatter
     public static function getAr($from)
     {
         return self::getKeyValue($from, self::getKey('YEAR'));
-    }
-
-    public static function getUtbildningsniva($from)
-    {
-        $value = self::getKeyValue($from, self::getKey('UTBILDNINGSNIVA'));
-        return self::$utbildningsniva[$value];
     }
 
     public static function getAlder($from)

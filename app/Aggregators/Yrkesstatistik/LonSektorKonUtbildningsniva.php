@@ -12,10 +12,12 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
     use ScbFormatter;
 
     public $factory;
+    public $weightedFactory;
 
-    public function __construct(EntryFactory $entryFactory)
+    public function __construct()
     {
-        $this->factory = $entryFactory->createFactory("Lön", ["Sektor", "Kön", "Utbildningsnivå", "År"]);
+        $this->factory = (new EntryFactory())->createFactory("Lön", ["Sektor", "Kön", "Utbildningsnivå", "År"]);
+        $this->weightedFactory = (new EntryFactory())->createFactory("Lön", ["Utbildningsnivå", "Viktat", "År"]);
     }
 
     public static function keys()
@@ -58,67 +60,35 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
             ["Samtliga", "?", "Alla", "?"]
         ));
 
-        dd($entries);
+        foreach ($entries as $e) {
+            $anstallda = $collection->findAllByKeysAndKeyValues(
+                ["Anställda", "Utbildningsnivå", "Ålder", "Kön", "År"],
+                [$e->getKeyValue("Utbildningsnivå"), "?", "?", $e->getKeyValue("År")]
+            );
 
-        $e = $entries[6];
+            $simpleUtbildningsniva = $this->getSimpleUtbildningnivaFromUtbildningsniva(
+                $e->getKeyValue('Utbildningsnivå')
+            );
 
-        $anstallda = $collection->findAllByKeysAndKeyValues(
-            ["Anställda", "Utbildningsnivå", "Ålder", "Kön", "År"],
-            [$e->getKeyValue("Utbildningsnivå"), "?", "?", $e->getKeyValue("År")]
-        );
+            $this->setWeighted(
+                [$simpleUtbildningsniva, $e->getKeyValue('År')],
+                Collection::sumEntries($anstallda),
+                $e->getValue()
+            );
 
-        dd(Collection::filterEntriesWithValidValue($entries), $withValues);
-
-        dd($e, Collection::sumEntries($entries), $e->getKeyValue("Utbildningsnivå"), $e->getKeyValue("År"));
-    }
-
-    public function run(Yrkesstatistik $yrkesstatistik)
-    {
-        $data = $yrkesstatistik->statistics['data'];
-
-        foreach ($data as $row) {
-
-            $year = self::getAr($row);
-            $sex = self::getKon($row);
-            $section = self::getSektionName($row);
-            $utbildningsniva = self::getUtbildningsniva($row);
-
-            if (!in_array($section, ['samtliga'])) {
-                continue;
-            }
-
-            //dd($row);
-
-
-            $value = data_get($row, 'values.0', 0);
-            $value = self::value($value, 'viktat-medelvärde', "anstallda.utbildningsniva.{$utbildningsniva}.{$year}.alla");
-
-            if ($sex === "bada" && $section === "samtliga") {
-                self::incValue($this->aggregated, "lon.utbildningsniva.{$utbildningsniva}.{$year}.alla.medellon", $value);
-            }
-
-            if ($yrkesstatistik->yrkesgrupp_id == 398 && $year == '2018') {
-                if ($sex == "bada" && $section == "samtliga") {
-                    print "UTB: " . $utbildningsniva . "\n";
-                    print "Sektion: " . $section . "\n";
-                    print "År: " . $year . "\n";
-                    print "Värde: " . $value['varde'] . "\n";
-                    print "Aktuellt värde: " . \Arr::get($this->aggregated, "lon.utbildningsniva.{$utbildningsniva}.{$year}.alla.medellon.varde");
-                    print "\n\n";
-                    print_r($row);
-                    print "-------\n\n";
-                }
-            } else {
-                continue;
-            }
-
-            //self::incValue($this->aggregated, "anstallda.total.{$year}.konsfordelning.{$sex}", $value);
-
-            /*
-            self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.alla", $value);
-            self::incValue($this->aggregated, "anstallda.regioner.{$region}.{$year}.konsfordelning.{$sex}", $value);*/
         }
 
-        self::update($yrkesstatistik, $this->aggregated);
+        foreach ($this->getAllWeighted() as $weighted) {
+            [$utbildningsniva, $ar] = $weighted['keys'];
+            $weightedValue = round_number($weighted['weighted_value'], 0);
+
+            $entry = $this->weightedFactory->makeEntry(
+                [$utbildningsniva, "Ja", $ar],
+                "Total",
+                $weightedValue
+            );
+
+            $collection->addEntry($entry);
+        }
     }
 }

@@ -3,9 +3,50 @@
 namespace App\Aggregators\Yrkesstatistik;
 
 use App\Yrkesstatistik;
+use Arr;
 
 abstract class BaseAggregator
 {
+    protected $weighted = [];
+
+    private function initWeighted(array $keys)
+    {
+        $keyName = implode('.', $keys);
+
+        if (! array_key_exists($keyName, $this->weighted)) {
+            $this->weighted[$keyName] = [
+                'keys' => $keys,
+                'count' => 0,
+                'value' => 0,
+                'weighted_value' => 0,
+            ];
+        }
+
+        return $keyName;
+    }
+
+    public function setWeighted(array $keys, $count, $value)
+    {
+        $keyName = $this->initWeighted($keys);
+
+        $this->weighted[$keyName]['count'] += $count;
+        $this->weighted[$keyName]['value'] += $value * $count;
+
+        try {
+            $this->weighted[$keyName]['weighted_value'] =
+                $this->weighted[$keyName]['value'] / $this->weighted[$keyName]['count'];
+        } catch (\ErrorException $e) {
+            // Should we do something?
+        }
+    }
+
+    public function getAllWeighted()
+    {
+        return collect($this->weighted)->map(function ($weighted) {
+            return Arr::only($weighted, ['keys', 'count', 'weighted_value']);
+        });
+    }
+
     public static function update(Yrkesstatistik $yrkesstatistik, $aggregation)
     {
         $aggregated = $yrkesstatistik->yrkesgrupp->yrkesstatistikAggregated()->firstOrCreate([], [
