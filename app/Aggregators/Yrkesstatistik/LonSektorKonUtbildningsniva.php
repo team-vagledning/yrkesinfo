@@ -57,7 +57,7 @@ class LonSektorKonUtbildningsniva extends BaseAggregator implements Yrkesstatist
     {
         $entries = Collection::filterEntriesWithValidValue($collection->findAllByKeysAndKeyValues(
             ["Lön", "Sektor", "Kön", "Utbildningsnivå", "År"],
-            ["Samtliga", "?", "Alla", "?"]
+            ["Samtliga", "Alla", "?", "?"]
         ));
 
         foreach ($entries as $e) {

@@ -45,7 +45,7 @@ class AggregateStatistics extends Command
         foreach (Yrkesgrupp::get() as $yrkesgrupp) {
 
             // For debug
-            $yrkesgrupp = Yrkesgrupp::where('name', 'Arkitekter m.fl.')->first();
+            //$yrkesgrupp = Yrkesgrupp::where('name', 'Arkitekter m.fl.')->first();
 
             $yrkesstatistik = Yrkesstatistik::latestPerSourceAndYrkesgrupp($yrkesgrupp)->get();
             $collection = new Collection();
@@ -55,8 +55,6 @@ class AggregateStatistics extends Command
                 app()->make($ys->source->aggregator)->firstRun($ys, $collection);
             }
 
-            //dd($collection);
-
             // Last run
             foreach ($yrkesstatistik as $ys) {
                 app()->make($ys->source->aggregator)->lastRun($ys, $collection);
@@ -64,24 +62,14 @@ class AggregateStatistics extends Command
 
 
             // Update
-            self::update($yrkesgrupp, $collection->toArray());
-
-            dd();
-
-
-            //
-            //dd();
+            self::createAggregated($yrkesgrupp, $collection->toArray());
         }
     }
 
-    public static function update(Yrkesgrupp $yrkesgrupp, $aggregation)
+    public static function createAggregated(Yrkesgrupp $yrkesgrupp, $aggregation)
     {
-        $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->firstOrCreate([], [
-            'statistics' => []
-        ]);
-
-        $aggregated->update([
-            'statistics' => array_replace_recursive($aggregated->statistics, $aggregation)
+        return $yrkesgrupp->yrkesstatistikAggregated()->create([
+            'statistics' => $aggregation
         ]);
     }
 }

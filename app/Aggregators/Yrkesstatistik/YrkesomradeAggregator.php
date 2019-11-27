@@ -44,7 +44,9 @@ class YrkesomradeAggregator extends BaseAggregator
             })->toArray();
 
             foreach ($yrkesomrade->yrkesgrupper as $yrkesgrupp) {
-                $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->first();
+                $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->orderBy('created_at', 'desc')->first();
+
+                dd($aggregated);
 
                 $anstallda = data_get($aggregated->statistics, "anstallda.total.{$YEAR}.alla.varde");
                 $medellon = data_get($aggregated->statistics, "lon.sektor.samtliga.{$YEAR}.alla.medellon.varde");
@@ -78,6 +80,8 @@ class YrkesomradeAggregator extends BaseAggregator
             $yrkesomrade->update([
                 'aggregated_statistics' => $r
             ]);
+
+            dd();
         }
 
     }
