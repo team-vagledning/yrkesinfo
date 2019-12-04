@@ -2,6 +2,7 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
+use App\Modules\Yrkesstatistik\Collection;
 use App\Region;
 use App\Yrkesomrade;
 use App\YrkesstatistikAggregated;
@@ -11,7 +12,7 @@ use Str;
 
 class YrkesomradeAggregator extends BaseAggregator
 {
-    const YEAR = '2018';
+    const YEAR = '2017';
 
     public function run()
     {
@@ -46,12 +47,37 @@ class YrkesomradeAggregator extends BaseAggregator
             foreach ($yrkesomrade->yrkesgrupper as $yrkesgrupp) {
                 $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->orderBy('created_at', 'desc')->first();
 
-                dd($aggregated);
+                $collection = (new Collection())->initializeFromArray($aggregated->statistics);
 
-                $anstallda = data_get($aggregated->statistics, "anstallda.total.{$YEAR}.alla.varde");
-                $medellon = data_get($aggregated->statistics, "lon.sektor.samtliga.{$YEAR}.alla.medellon.varde");
-                $percentil10 = data_get($aggregated->statistics, "lon.sektor.samtliga.{$YEAR}.alla.percentil10.varde");
-                $percentil90 = data_get($aggregated->statistics, "lon.sektor.samtliga.{$YEAR}.alla.percentil90.varde");
+                $anstallda = $collection->findFirstByKeysAndKeyValues(
+                    ["Anställda", "Län", "Kön", "År"],
+                    [ScbFormatter::$regioner['00'], ScbFormatter::$kon['1+2'], $YEAR]
+                )->getValue();
+
+                $medellon = $collection->findFirstByKeysAndKeyValues(
+                    ["Lön", "Sektor", "Kön", "År"],
+                    [ScbFormatter::$sektioner['0'], ScbFormatter::$kon['1+2'], $YEAR],
+                    'Medel'
+                )->getValue();
+
+                $percentil10 = $collection->findFirstByKeysAndKeyValues(
+                    ["Lön", "Sektor", "Kön", "År"],
+                    [ScbFormatter::$sektioner['0'], ScbFormatter::$kon['1+2'], $YEAR],
+                    'MedelPercentile10'
+                )->getValue();
+
+                $percentil90 = $collection->findFirstByKeysAndKeyValues(
+                    ["Lön", "Sektor", "Kön", "År"],
+                    [ScbFormatter::$sektioner['0'], ScbFormatter::$kon['1+2'], $YEAR],
+                    'MedelPercentile90'
+                )->getValue();
+
+                $medellonUtbildningsniva = $collection->findAllByKeys(
+                    ["Lön", "Utbildningsnivå", "Viktat", "År"]
+                );
+
+                dd($medellonUtbildningsniva);
+
 
                 $lon['medel'] += $anstallda * $medellon;
                 $lon['percentil10'] += $anstallda * $percentil10;
@@ -62,7 +88,13 @@ class YrkesomradeAggregator extends BaseAggregator
                 // Karta
                 foreach ($regioner as $key => $values) {
                     $region = $values['namn'];
-                    $regioner[$key]['anstallda'] = $values['anstallda'] + data_get($aggregated->statistics, "anstallda.regioner.{$region}.{$YEAR}.alla.varde");
+
+                    $anstalldaRegion = $collection->findFirstByKeysAndKeyValues(
+                        ["Anställda", "Län", "Kön", "År"],
+                        [$region, ScbFormatter::$kon['1+2'], $YEAR]
+                    )->getValue();
+
+                    $regioner[$key]['anstallda'] = $values['anstallda'] + $anstalldaRegion;
                 }
 
             }

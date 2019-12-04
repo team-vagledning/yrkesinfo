@@ -44,7 +44,7 @@ abstract class BaseAggregator
     {
         return collect($this->weighted)->map(function ($weighted) {
             return Arr::only($weighted, ['keys', 'count', 'weighted_value']);
-        });
+        })->toArray();
     }
 
     public static function update(Yrkesstatistik $yrkesstatistik, $aggregation)

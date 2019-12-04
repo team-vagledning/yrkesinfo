@@ -12,9 +12,10 @@ class AnstalldaUtbildningsnivaKon extends BaseAggregator implements Yrkesstatist
 
     public $factory;
 
-    public function __construct(EntryFactory $entryFactory)
+    public function __construct()
     {
-        $this->factory = $entryFactory->createFactory("Anställda", ["Utbildningsnivå", "Ålder", "Kön", "År"]);
+        $this->factory = (new EntryFactory())->createFactory("Anställda", ["Utbildningsnivå", "Ålder", "Kön", "År"]);
+        $this->simpleFactory = (new EntryFactory())->createFactory("Anställda", ["Utbildningsnivå", "Enkel", "År"]);
     }
 
     public static function keys()
@@ -37,14 +38,24 @@ class AnstalldaUtbildningsnivaKon extends BaseAggregator implements Yrkesstatist
             $sex = self::getKon($row);
             $age = self::getAlder($row);
             $utbildningsniva = self::getUtbildningsniva($row);
+            $value = data_get($row, 'values.0', 0);
 
             $entry = $this->factory->makeEntry(
                 [$utbildningsniva, $age, $sex, $year],
                 "Total",
-                data_get($row, 'values.0', 0)
+                $value
             );
 
+            $simpleEntry = $this->simpleFactory->findOrMakeEntry($collection, [
+                self::getUtbildningsniva($row, true),
+                "Ja",
+                $year
+            ]);
+
+            $simpleEntry->setValue($simpleEntry->getValue() + $value);
+
             $collection->addEntry($entry);
+            $collection->addEntry($simpleEntry);
         }
 
         return true;

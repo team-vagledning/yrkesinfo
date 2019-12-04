@@ -43,7 +43,6 @@ class AggregateStatistics extends Command
     public function handle()
     {
         foreach (Yrkesgrupp::get() as $yrkesgrupp) {
-
             // For debug
             //$yrkesgrupp = Yrkesgrupp::where('name', 'Arkitekter m.fl.')->first();
 
@@ -59,7 +58,6 @@ class AggregateStatistics extends Command
             foreach ($yrkesstatistik as $ys) {
                 app()->make($ys->source->aggregator)->lastRun($ys, $collection);
             }
-
 
             // Update
             self::createAggregated($yrkesgrupp, $collection->toArray());

@@ -39,6 +39,32 @@ class CollectionTest extends TestCase
         $this->assertInstanceOf(Entry::class, $searchedEntry);
     }
 
+    public function testFindByKeyWhenSimiliar()
+    {
+        $collection = app(Collection::class);
+
+        $entryFactory1 = (new EntryFactory())->createFactory("Lön", ["Kön", "År"]);
+        $entryFactory2 = (new EntryFactory())->createFactory("Lön", ["Kön", "Län", "År"]);
+
+        $collection->addEntries([
+            $entryFactory1->makeEntry(["Man", 2000], "Total", 10),
+            $entryFactory1->makeEntry(["Kvinna", 2001], "Total", 10),
+            $entryFactory2->makeEntry(["Man", "Jönköpings län", 2000], "Total", 1000),
+        ]);
+
+        $queryKeys = ["Lön", "Kön", "År"];
+
+        $searchedEntries = $collection->findAllByKeys($queryKeys);
+        $searchedEntry = $collection->findFirstByKeys($queryKeys);
+
+        $this->assertCount(2, $searchedEntries);
+        $this->assertInstanceOf(Entry::class, $searchedEntry);
+
+
+        $entry = $entryFactory2->findOrMakeEntry($collection, ["Man"]);
+        $this->assertEquals(1000, $entry->getValue());
+    }
+
     public function testFindByMultipleKeyValueOptions()
     {
         $collection = app(Collection::class);

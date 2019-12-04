@@ -59,7 +59,9 @@ class Collection implements Arrayable
         $results = [];
 
         foreach ($this->collection as $entry) {
-            if (empty(array_diff(self::removeUnknownKeys($keys), $entry->getKeys()))) {
+            $diff = array_diff($entry->getKeys(), self::removeUnknownKeys($keys));
+
+            if (empty($diff) && count($entry->getKeys()) >= count(self::removeUnknownKeys($keys))) {
                 $results[] = $entry;
             }
         }
@@ -137,6 +139,7 @@ class Collection implements Arrayable
     public function findAllByKeysAndKeyValues(array $keys, array $keyValues, $valueType = false) : array
     {
         $entries = $this->findAllByKeys($keys);
+
         $entries = $this->findAllByKeyValues($keyValues, $entries, $valueType);
 
         return $entries;
