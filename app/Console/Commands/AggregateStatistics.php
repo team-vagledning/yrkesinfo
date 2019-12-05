@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Aggregators\Yrkesstatistik\YrkesomradeAggregator;
+use App\Modules\Yrkesstatistik\Collection;
+use App\Yrkesgrupp;
 use App\Yrkesstatistik;
 use App\YrkesstatistikAggregated;
 use Illuminate\Console\Command;
@@ -40,16 +42,32 @@ class AggregateStatistics extends Command
      */
     public function handle()
     {
+        foreach (Yrkesgrupp::get() as $yrkesgrupp) {
+            // For debug
+            //$yrkesgrupp = Yrkesgrupp::where('name', 'Arkitekter m.fl.')->first();
 
-        foreach (Yrkesstatistik::latestPerSourceAndYrkesgrupp()->get() as $statistics) {
-            $aggregator = $statistics->source->aggregator;
+            $yrkesstatistik = Yrkesstatistik::latestPerSourceAndYrkesgrupp($yrkesgrupp)->get();
+            $collection = new Collection();
 
-            if ($aggregator) {
-                app()->make($aggregator)->run($statistics);
+            // First run
+            foreach ($yrkesstatistik as $ys) {
+                app()->make($ys->source->aggregator)->firstRun($ys, $collection);
             }
+
+            // Last run
+            foreach ($yrkesstatistik as $ys) {
+                app()->make($ys->source->aggregator)->lastRun($ys, $collection);
+            }
+
+            // Update
+            self::createAggregated($yrkesgrupp, $collection->toArray());
         }
+    }
 
-        //resolve(YrkesomradeAggregator::class)->run();
-
+    public static function createAggregated(Yrkesgrupp $yrkesgrupp, $aggregation)
+    {
+        return $yrkesgrupp->yrkesstatistikAggregated()->create([
+            'statistics' => $aggregation
+        ]);
     }
 }
