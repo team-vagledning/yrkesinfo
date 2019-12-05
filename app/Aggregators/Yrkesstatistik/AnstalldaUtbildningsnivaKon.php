@@ -55,7 +55,7 @@ class AnstalldaUtbildningsnivaKon extends BaseAggregator implements Yrkesstatist
             $simpleEntry->setValue($simpleEntry->getValue() + $value);
 
             $collection->addEntry($entry);
-            $collection->addEntry($simpleEntry);
+            $collection->addEntry($simpleEntry, true);
         }
 
         return true;

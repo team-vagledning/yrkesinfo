@@ -88,9 +88,9 @@ trait ScbFormatter
         '2' => 'Ingen gymnasieutbildning',
         '3' => 'Gymnasieutbildning',
         '4' => 'Gymnasieutbildning',
-        '5' => 'Gymnasieutbildning',
-        '6' => 'Eftergymnasial utbildning upp till 2 år',
-        '7' => 'Eftergymnasial utbildning upp till 2 år',
+        '5' => 'Eftergymnasial utbildning upp till 2 år',
+        '6' => 'Eftergymnasial utbildning 3 år eller mer',
+        '7' => 'Eftergymnasial utbildning 3 år eller mer',
         '8' => 'Eftergymnasial utbildning 3 år eller mer',
         '9' => 'Eftergymnasial utbildning 3 år eller mer',
         'TOTALT' => 'Samtliga utbildningsnivåer',
@@ -138,7 +138,15 @@ trait ScbFormatter
     {
         $id = self::getKeyValue($from, self::getKey('SEKTOR'));
 
-        if (array_key_exists($id, $simple ? self::$simpleSektioner : self::$sektioner)) {
+        if ($simple) {
+            if (array_key_exists($id, self::$simpleSektioner)) {
+                return self::$simpleSektioner[$id];
+            }
+
+            return end(self::$simpleSektioner);
+        }
+
+        if (array_key_exists($id, self::$sektioner)) {
             return self::$sektioner[$id];
         }
 
@@ -149,7 +157,15 @@ trait ScbFormatter
     {
         $id = self::getKeyValue($from, self::getKey('UTBILDNINGSNIVA'));
 
-        if (array_key_exists($id, $simple ? self::$simpleUtbildningsniva : self::$utbildningsniva)) {
+        if ($simple) {
+            if (array_key_exists($id, self::$simpleUtbildningsniva)) {
+                return self::$simpleUtbildningsniva[$id];
+            }
+
+            return end(self::$simpleUtbildningsniva);
+        }
+
+        if (array_key_exists($id, self::$utbildningsniva)) {
             return self::$utbildningsniva[$id];
         }
 

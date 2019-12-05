@@ -34,6 +34,8 @@ class YrkesomradeAggregator extends BaseAggregator
                'percentil90' => 0,
             ];
 
+            $utbildningsstege = [];
+
             $regioner = resolve(Region::class)->get()->map(function ($region) use ($yrkesomrade) {
                 return [
                     'id' => $region->external_id,
@@ -76,8 +78,20 @@ class YrkesomradeAggregator extends BaseAggregator
                     ["Lön", "Utbildningsnivå", "Viktat", "År"]
                 );
 
-                dd($medellonUtbildningsniva);
+                foreach ($medellonUtbildningsniva as $mU) {
+                    $ar = $mU->getKeyValue('År');
+                    $utbildningsniva = $mU->getKeyValue('Utbildningsnivå');
 
+                    $anstalldaUtbildningsniva = $collection->findFirstByKeysAndKeyValues(
+                        ["Anställda", "Utbildningsnivå", "Enkel", "År"],
+                        [$utbildningsniva, "Ja", $ar]
+                    );
+
+                    if ($anstalldaUtbildningsniva) {
+                        data_inc($utbildningsstege, "{$utbildningsniva}.{$ar}.anstallda", $anstalldaUtbildningsniva->getValue());
+                        data_inc($utbildningsstege, "{$utbildningsniva}.{$ar}.lon", $anstalldaUtbildningsniva->getValue() * $mU->getValue());
+                    }
+                }
 
                 $lon['medel'] += $anstallda * $medellon;
                 $lon['percentil10'] += $anstallda * $percentil10;
@@ -103,17 +117,25 @@ class YrkesomradeAggregator extends BaseAggregator
             $lon['percentil10'] = (int) round($lon['percentil10'] / $antalAnstallda);
             $lon['percentil90'] = (int) round($lon['percentil90'] / $antalAnstallda);
 
+            foreach ($utbildningsstege as $utbildningsniva => $uV) {
+                foreach ($utbildningsstege[$utbildningsniva] as $ar => $aV) {
+
+                    $utbildningsstege[$utbildningsniva][$ar]['lon'] =
+                        (int) round($utbildningsstege[$utbildningsniva][$ar]['lon'] / $utbildningsstege[$utbildningsniva][$ar]['anstallda']);
+                }
+            }
+
             $r = [
                 "lon" => $lon,
                 "bristindex" => $this->getBristindex($yrkesomrade),
                 "regioner" => $regioner,
+                'utbildningsstege' => $utbildningsstege
             ];
 
             $yrkesomrade->update([
                 'aggregated_statistics' => $r
             ]);
 
-            dd();
         }
 
     }
