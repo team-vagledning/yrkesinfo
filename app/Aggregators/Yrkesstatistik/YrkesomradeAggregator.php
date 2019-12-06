@@ -118,7 +118,7 @@ class YrkesomradeAggregator extends BaseAggregator
             $lon['percentil90'] = (int) round($lon['percentil90'] / $antalAnstallda);
 
             $utbildningsstege = $this->makeUtbildningsstegeWeighted($utbildningsstege);
-            
+
             $r = [
                 "lon" => $lon,
                 "bristindex" => $this->getBristindex($yrkesomrade),
@@ -144,7 +144,7 @@ class YrkesomradeAggregator extends BaseAggregator
                         'anstallda' => $values['anstallda'],
                         'lon' => (int) round($values['lon'] / $values['anstallda'])
                     ];
-                })->values()->all()
+                })->sortByDesc('ar')->values()->all()
             ];
         })->values()->all();
     }
