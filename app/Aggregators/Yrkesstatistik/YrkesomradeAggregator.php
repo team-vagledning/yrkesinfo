@@ -117,14 +117,8 @@ class YrkesomradeAggregator extends BaseAggregator
             $lon['percentil10'] = (int) round($lon['percentil10'] / $antalAnstallda);
             $lon['percentil90'] = (int) round($lon['percentil90'] / $antalAnstallda);
 
-            foreach ($utbildningsstege as $utbildningsniva => $uV) {
-                foreach ($utbildningsstege[$utbildningsniva] as $ar => $aV) {
-
-                    $utbildningsstege[$utbildningsniva][$ar]['lon'] =
-                        (int) round($utbildningsstege[$utbildningsniva][$ar]['lon'] / $utbildningsstege[$utbildningsniva][$ar]['anstallda']);
-                }
-            }
-
+            $utbildningsstege = $this->makeUtbildningsstegeWeighted($utbildningsstege);
+            
             $r = [
                 "lon" => $lon,
                 "bristindex" => $this->getBristindex($yrkesomrade),
@@ -137,7 +131,22 @@ class YrkesomradeAggregator extends BaseAggregator
             ]);
 
         }
+    }
 
+    public function makeUtbildningsstegeWeighted($utbildningsstege)
+    {
+        return collect($utbildningsstege)->map(function ($item, $utbildningsniva) {
+            return [
+                'name' => $utbildningsniva,
+                'varden' => collect($item)->map(function ($values, $year) {
+                    return [
+                        'ar' => $year,
+                        'anstallda' => $values['anstallda'],
+                        'lon' => (int) round($values['lon'] / $values['anstallda'])
+                    ];
+                })->values()->all()
+            ];
+        })->values()->all();
     }
 
     public static function findVardeKeys($input)
