@@ -48,11 +48,20 @@ class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggrega
                 $year
             ]);
 
+            // Sum for both sexes and simple sektion
+            $sumAll = $this->factory->findOrMakeEntry($collection, [
+                self::getSektionName($row, true),
+                ScbFormatter::$kon['1+2'],
+                $year
+            ]);
+
             // Update the sum
             $sumSexes->setValue($sumSexes->getValue() + $value);
+            $sumAll->setValue($sumAll->getValue() + $value);
 
             $collection->addEntry($entry);
             $collection->addEntry($sumSexes, true);
+            $collection->addEntry($sumAll, true);
         }
     }
 
@@ -61,25 +70,6 @@ class AnstalldaSektorKon extends BaseAggregator implements YrkesstatistikAggrega
         //$years = $collection->getUniqueKeyValuesByKeys(["Anställda", "Sektor", "Kön", "År"])['År'];
 
         // TODO: Aggregera till Offentlig och Privat
-    }
-
-    public function run(Yrkesstatistik $yrkesstatistik)
-    {
-        $data = $yrkesstatistik->statistics['data'];
-
-        foreach ($data as $row) {
-            $sector = self::getSektionName($row);
-            $year = self::getAr($row);
-            $sex = self::getKon($row);
-
-            $value = data_get($row, 'values.0', 0);
-            $value = self::value($value, 'summera');
-
-            self::incValue($this->aggregated, "anstallda.sektor.{$sector}.{$year}.alla", $value);
-            self::incValue($this->aggregated, "anstallda.sektor.{$sector}.{$year}.konsfordelning.{$sex}", $value);
-        }
-
-        self::update($yrkesstatistik, $this->aggregated);
     }
 
 }

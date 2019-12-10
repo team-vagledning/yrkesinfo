@@ -34,6 +34,11 @@ class YrkesomradeAggregator extends BaseAggregator
                'percentil90' => 0,
             ];
 
+            $anstalldaSektorer = [
+                'Offentlig' => 0,
+                'Privat' => 0,
+            ];
+
             $utbildningsstege = [];
 
             $regioner = resolve(Region::class)->get()->map(function ($region) use ($yrkesomrade) {
@@ -55,6 +60,15 @@ class YrkesomradeAggregator extends BaseAggregator
                     ["Anställda", "Län", "Kön", "År"],
                     [ScbFormatter::$regioner['00'], ScbFormatter::$kon['1+2'], $YEAR]
                 )->getValue();
+
+                $sektorer = $collection->findAllByKeysAndKeyValues(
+                    ["Anställda", "Sektor", "Kön", "År"],
+                    [["Offentlig", "Privat"], ScbFormatter::$kon['1+2'], $YEAR]
+                );
+
+                foreach ($sektorer as $sektor) {
+                    $anstalldaSektorer[$sektor->getKeyValue('Sektor')] += $sektor->getValue();
+                }
 
                 $medellon = $collection->findFirstByKeysAndKeyValues(
                     ["Lön", "Sektor", "Kön", "År"],
@@ -120,6 +134,8 @@ class YrkesomradeAggregator extends BaseAggregator
             $utbildningsstege = $this->makeUtbildningsstegeWeighted($utbildningsstege);
 
             $r = [
+                "anstallda" => $antalAnstallda,
+                "sektorer" => $this->anstalldaSektorerToArray($anstalldaSektorer),
                 "lon" => $lon,
                 "bristindex" => $this->getBristindex($yrkesomrade),
                 "regioner" => $regioner,
@@ -145,6 +161,16 @@ class YrkesomradeAggregator extends BaseAggregator
                         'lon' => (int) round($values['lon'] / $values['anstallda'])
                     ];
                 })->sortByDesc('ar')->values()->all()
+            ];
+        })->values()->all();
+    }
+
+    public function anstalldaSektorerToArray($anstalldaSektorer)
+    {
+        return collect($anstalldaSektorer)->map(function ($anstalla, $sektor) {
+            return [
+                'name' => $sektor,
+                'anstallda' => $anstalla
             ];
         })->values()->all();
     }

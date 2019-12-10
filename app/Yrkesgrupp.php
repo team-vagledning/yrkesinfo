@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class Yrkesgrupp extends Model
 {
@@ -13,6 +14,7 @@ class Yrkesgrupp extends Model
     protected $casts = [
         'alternative_ssyk' => 'array',
         'yrkesbenamningar' => 'array',
+        'aggregated_statistics' => 'array'
     ];
 
     public function yrkesomraden()
