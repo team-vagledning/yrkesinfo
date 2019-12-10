@@ -16,7 +16,8 @@ class Yrkesomrade extends Model
     protected $appends = ['bristindex'];
 
     protected $casts = [
-        'aggregated_statistics' => 'array'
+        'aggregated_statistics' => 'array',
+        'extras' => 'array',
     ];
 
     /**
