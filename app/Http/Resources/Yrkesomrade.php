@@ -18,6 +18,7 @@ class Yrkesomrade extends JsonResource
         return [
             'id' => $this->id,
             'external_id' => $this->external_id,
+            'old_yrkesinfo_id' => $this->extras['old_yrkesinfo_id'],
             'name' => $this->name,
             'description' => $this->description,
             'loner' => $this->aggregated_statistics['lon'],
