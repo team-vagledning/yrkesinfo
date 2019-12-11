@@ -46,7 +46,7 @@ class YrkesomradeAggregator extends BaseAggregator
                     'id' => $region->external_id,
                     'namn' => $region->name,
                     'anstallda' => 0,
-                    'ledigaJobb' => $this->getAntalAnstalldaIRegion($yrkesomrade->external_id, $region->external_id),
+                    'ledigaJobb' => $this->getNumOfAdsFromPlatsbanken($yrkesomrade->external_id, $region->external_id),
                     'bristindex' => $this->getBristindexForRegion($yrkesomrade, $region->id)
                 ];
             })->toArray();
@@ -185,7 +185,7 @@ class YrkesomradeAggregator extends BaseAggregator
         });
     }
 
-    public function getAntalAnstalldaIRegion($yrkesomradeId, $regionId)
+    public function getNumOfAdsFromPlatsbanken($yrkesomradeId, $regionId)
     {
         $results = [];
 

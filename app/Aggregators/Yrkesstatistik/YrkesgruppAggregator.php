@@ -23,16 +23,16 @@ class YrkesgruppAggregator extends BaseAggregator
         $yrkesgrupper = Yrkesgrupp::get();
 
         foreach ($yrkesgrupper as $yrkesgrupp) {
-            /*
+
             $regioner = resolve(Region::class)->get()->map(function ($region) use ($yrkesgrupp) {
                 return [
                     'id' => $region->external_id,
                     'namn' => $region->name,
                     'anstallda' => 0,
-                    'ledigaJobb' => $this->getAntalAnstalldaIRegion($yrkesomrade->external_id, $region->external_id),
-                    'bristindex' => $this->getBristindexForRegion($yrkesomrade, $region->id)
+                    'ledigaJobb' => $this->getNumOfAdsFromPlatsbanken($yrkesgrupp->ssyk, $region->external_id),
+                    'bristindex' => $this->getBristindexForRegion($yrkesgrupp, $region->id)
                 ];
-            })->toArray();*/
+            })->toArray();
 
             $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->orderBy('created_at', 'desc')->first();
 
@@ -55,25 +55,25 @@ class YrkesgruppAggregator extends BaseAggregator
             });
 
 
-                // Karta
-                /*
-                foreach ($regioner as $key => $values) {
-                    $region = $values['namn'];
+            // Karta
+            foreach ($regioner as $key => $values) {
+                $region = $values['namn'];
 
-                    $anstalldaRegion = $collection->findFirstByKeysAndKeyValues(
-                        ["Anställda", "Län", "Kön", "År"],
-                        [$region, ScbFormatter::$kon['1+2'], $YEAR]
-                    )->getValue();
+                $anstalldaRegion = $collection->findFirstByKeysAndKeyValues(
+                    ["Anställda", "Län", "Kön", "År"],
+                    [$region, ScbFormatter::$kon['1+2'], $YEAR]
+                )->getValue();
 
-                    $regioner[$key]['anstallda'] = $values['anstallda'] + $anstalldaRegion;
-                }
-                */
+                $regioner[$key]['anstallda'] = $values['anstallda'] + $anstalldaRegion;
+            }
+
 
             $r = [
                 "anstallda" => $anstallda,
                 "sektorer" => $sektorer,
-                //"bristindex" => $this->getBristindex($yrkesomrade),
-                //"regioner" => $regioner,
+                "bristindex" => $this->getBristindex($yrkesgrupp),
+                "ledigaJobb" => $this->getNumOfAdsFromPlatsbanken($yrkesgrupp->ssyk),
+                "regioner" => $regioner,
             ];
 
             $yrkesgrupp->update([
@@ -83,15 +83,67 @@ class YrkesgruppAggregator extends BaseAggregator
         }
     }
 
-
-    public function getBristindex($yrkesomrade)
+    public function getNumOfAdsFromPlatsbanken($ssyk, $regionId = false)
     {
-        return self::round($yrkesomrade->bristindex()->ettAr()->avg('bristindex'));
+        $results = [];
+
+        $baseUrl = "https://www.arbetsformedlingen.se/rest/pbapi/af/v1/matchning/matchandeRekryteringsbehov";
+        $payload = [
+            "matchningsprofil" => [
+                "profilkriterier" => [
+                    [
+                        "varde" => "**",
+                        "namn" => "**",
+                        "typ" => "FRITEXT"
+                    ],
+                    [
+                        "varde" => $ssyk,
+                        "namn" => "",
+                        "typ" => "YRKESGRUPP_ROLL"
+                    ]
+                ]
+            ],
+            "sorteringsordning" => "RELEVANS",
+            "startrad" => 0,
+            "maxAntal" => 1,
+        ];
+
+        if ($regionId) {
+            // Prepend a zero to regionId, ex. must be 01 and not 1
+            if ($regionId < 10) {
+                $regionId = "0{$regionId}";
+            }
+
+            $payload["matchningsprofil"]["profilkriterier"][] = [
+                "varde" => $regionId,
+                "namn" => "",
+                "typ" => "LAN"
+            ];
+        }
+
+
+
+        try {
+            $client = new Client(['headers' => ['Accept' => 'application/json', 'Accept-Language' => 'sv']]);
+            $response = $client->post($baseUrl, ['json' => $payload]);
+
+            $results = json_decode($response->getBody()->getContents());
+        } catch (\Exception $e) {
+
+            return 0;
+        }
+
+        return data_get($results, 'antalPlatser', 0);
     }
 
-    public function getBristindexForRegion($yrkesomrade, $regionId)
+    public function getBristindex($yrkesgrupp)
     {
-        return self::round($yrkesomrade->bristindex()->ettAr()->where('region_id', $regionId)->avg('bristindex'));
+        return self::round($yrkesgrupp->bristindex()->ettAr()->avg('bristindex'));
+    }
+
+    public function getBristindexForRegion($yrkesgrupp, $regionId)
+    {
+        return self::round($yrkesgrupp->bristindex()->ettAr()->where('region_id', $regionId)->avg('bristindex'));
     }
 
     public static function round($value)

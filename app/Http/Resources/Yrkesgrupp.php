@@ -22,6 +22,9 @@ class Yrkesgrupp extends JsonResource
             'description' => $this->description,
             'anstallda' => $this->aggregated_statistics['anstallda'],
             'sektorer' => $this->aggregated_statistics['sektorer'],
+            'bristindex' => $this->aggregated_statistics['bristindex'],
+            'ledigaJobb' => $this->aggregated_statistics['ledigaJobb'],
+            'regioner' => $this->aggregated_statistics['regioner'],
             'yrkesgrupper' => self::collection($this->when(isset($this->siblings), $this->siblings)),
         ];
     }
