@@ -36,6 +36,11 @@ class Yrkesomrade extends Model
         return $this->hasManyDeepFromRelations($this->yrkesgrupper(), (new Yrkesgrupp)->bristindex());
     }
 
+    public function texts()
+    {
+        return $this->morphMany(Text::class, 'ref');
+    }
+
     /**
      * Find Yrkesomrade from Arbetsförmedlingen Taxonomy
      *
