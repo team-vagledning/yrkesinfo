@@ -12,13 +12,17 @@ class Yrkesgrupp extends Model
 
     protected $casts = [
         'alternative_ssyk' => 'array',
-        'yrkesbenamningar' => 'array',
         'aggregated_statistics' => 'array'
     ];
 
     public function yrkesomraden()
     {
         return $this->belongsToMany(Yrkesomrade::class, 'yrkesomraden_has_yrkesgrupper');
+    }
+
+    public function yrkesbenamningar()
+    {
+        return $this->belongsToMany(Yrkesbenamning::class, 'yrkesgrupper_has_yrkesbenamningar');
     }
 
     public function yrkesstatistik()

@@ -330,7 +330,7 @@ objects:
         app: ${APP_NAME}
     spec:
       ports:
-          - name: http
+        - name: http
           port: 8080
           protocol: TCP
           targetPort: 8080

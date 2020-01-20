@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Importers\Taxonomy;
+namespace App\Importers\Taxonomy\Api\V0;
 
 use App\Importers\ImporterInterface;
 use App\Importers\Taxonomy\Mappings\YrkesbenamningMapper;

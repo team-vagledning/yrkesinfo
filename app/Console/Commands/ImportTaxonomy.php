@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Importers\Taxonomy\Api\V1\ApiImporter;
 use const App\Console\EXIT_FAILURE;
 use const App\Console\EXIT_OK;
 use App\Importers\Taxonomy\AlternativeSsykImporter;
-use App\Importers\Taxonomy\ApiImporter;
 use App\Importers\Taxonomy\FileImporter;
 use Faker\Provider\File;
 use Illuminate\Console\Command;
