@@ -33,7 +33,7 @@ class ApiImporter implements ImporterInterface
     /**
      * @var Collection
      */
-    public $yrkesgrupperYrkesbenmningarMapping;
+    public $yrkesgrupperYrkesbenamningarMapping;
 
     /**
      * @var Collection;
@@ -55,8 +55,7 @@ class ApiImporter implements ImporterInterface
         $this->fetchAll();
 
         $this->insertYrkesbenamningar();
-
-        //$this->insertYrkesomraden();
+        $this->insertYrkesomraden();
         $this->insertYrkesgrupper();
     }
 
@@ -94,40 +93,20 @@ class ApiImporter implements ImporterInterface
 
     public function getYrkesomradenFromMapping($taxonomyId)
     {
-        // Find the correct keys, they are always mapped [parent, child, parent, child]
-        $keys = array_keys(
-            array_column(
-                $this->yrkesomradenYrkesgrupperMapping->toArray(),
-                'taxonomy/id'
-            ),
-            $taxonomyId
-        );
-
-        // As we got the parent, we have do incremement every key and the the corresponding
-        // yrkesomrade
-        return collect($keys)->map(function ($key) {
-            $yrkesomrade = $this->yrkesomradenYrkesgrupperMapping->get($key + 1);
-            return Yrkesomrade::fromArbetsformedlingenByExternalId($yrkesomrade->{'taxonomy/id'})->first();
-        });
+        return $this->yrkesomradenYrkesgrupperMapping
+            ->where('taxonomy/source', '=', $taxonomyId)
+            ->map(function ($edge) {
+                return Yrkesomrade::fromArbetsformedlingenByExternalId($edge->{'taxonomy/target'})->first();
+            });
     }
 
     public function getYrkesbenamningarFromMapping($taxonomyId)
     {
-        // Find the correct keys, they are always mapped [parent, child, parent, child]
-        $keys = array_keys(
-            array_column(
-                $this->yrkesgrupperYrkesbenmningarMapping->toArray(),
-                'taxonomy/id'
-            ),
-            $taxonomyId
-        );
-
-        // As we got the parent, we have do incremement every key and the the corresponding
-        // yrkesomrade
-        return collect($keys)->map(function ($key) {
-            $yrkesbenamning = $this->yrkesgrupperYrkesbenmningarMapping->get($key + 1);
-            return Yrkesbenamning::where('external_id', $yrkesbenamning->{'taxonomy/id'})->first();
-        });
+        return $this->yrkesgrupperYrkesbenamningarMapping
+            ->where('taxonomy/target', '=', $taxonomyId)
+            ->map(function ($edge) {
+                return Yrkesbenamning::where('external_id', $edge->{'taxonomy/source'})->first();
+            });
     }
 
     /**
@@ -144,9 +123,9 @@ class ApiImporter implements ImporterInterface
                 'description' => $yrkesgrupp->{'taxonomy/definition'},
             ]);
 
-            $yrkesomraden = $this->getYrkesomradenFromMapping($yrkesgrupp->{'taxonomy/id'});
-            $yrkesbenamingar = $this->getYrkesbenamningarFromMapping($yrkesgrupp->{'taxonomy/id'});
-
+            $yrkesomraden = $this->getYrkesomradenFromMapping($yrkesgrupp->external_id);
+            $yrkesbenamingar = $this->getYrkesbenamningarFromMapping($yrkesgrupp->external_id);
+            
             // Sync yrkesgrupp to yrkesområde, and also yrkesbenämningar
             $yrkesgrupp->yrkesomraden()->syncWithoutDetaching($yrkesomraden->pluck('id'));
             $yrkesgrupp->yrkesbenamningar()->syncWithoutDetaching($yrkesbenamingar->pluck('id'));
@@ -160,16 +139,14 @@ class ApiImporter implements ImporterInterface
      */
     public function fetchAll()
     {
-        //$this->yrkesomraden = $this->fetchYrkesomraden();
+        $this->yrkesomraden = $this->fetchYrkesomraden();
         $this->yrkesgrupper = $this->fetchYrkesgrupper();
         $this->yrkesbenamningar = $this->fetchYrkesbenamningar();
 
         // Get mappings
         $this->yrkesomradenYrkesgrupperMapping = $this->fetchYrkesgrupperYrkesomradenMapping();
-        $this->yrkesgrupperYrkesbenmningarMapping = $this->fetchYrkesgrupperYrkesbenamningarMapping();
+        $this->yrkesgrupperYrkesbenamningarMapping = $this->fetchYrkesgrupperYrkesbenamningarMapping();
 
-
-        dd($this->yrkesgrupperYrkesbenmningarMapping);
 
         return $this;
     }
@@ -218,7 +195,7 @@ class ApiImporter implements ImporterInterface
             'query' => $params
         ]);
 
-        return collect(json_decode($res->getBody())->{'taxonomy/graph'}->{'taxonomy/nodes'});
+        return collect(json_decode($res->getBody())->{'taxonomy/graph'}->{'taxonomy/edges'});
     }
 
     public function fetchYrkesgrupperYrkesbenamningarMapping()
@@ -233,7 +210,7 @@ class ApiImporter implements ImporterInterface
             'query' => $params
         ]);
 
-        return collect(json_decode($res->getBody())->{'taxonomy/graph'}->{'taxonomy/nodes'});
+        return collect(json_decode($res->getBody())->{'taxonomy/graph'}->{'taxonomy/edges'});
     }
 
     /**
