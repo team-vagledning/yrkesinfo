@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Yrkesbenamning extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'yrkesbenamningar';
 
     protected $guarded = [];

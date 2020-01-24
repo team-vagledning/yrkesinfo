@@ -3,6 +3,7 @@
 namespace App\Importers\Taxonomy\Api\V1;
 
 use App\Importers\ImporterInterface;
+use App\Region;
 use App\Yrkesbenamning;
 use App\Yrkesgrupp;
 use App\Yrkesomrade;
@@ -21,9 +22,14 @@ class ApiImporter implements ImporterInterface
     public $yrkesomraden;
 
     /**
-     * @var Collection;
+     * @var Collection
      */
     public $yrkesgrupper;
+
+    /**
+     * @var Collection
+     */
+    public $regioner;
 
     /**
      * @var Collection
@@ -54,6 +60,7 @@ class ApiImporter implements ImporterInterface
     {
         $this->fetchAll();
 
+        $this->insertRegioner();
         $this->insertYrkesbenamningar();
         $this->insertYrkesomraden();
         $this->insertYrkesgrupper();
@@ -65,6 +72,11 @@ class ApiImporter implements ImporterInterface
     public function insertYrkesomraden()
     {
         $this->yrkesomraden->each(function ($yrkesomrade) {
+            if (array_key_exists('taxonomy/deprecated', $yrkesomrade)) {
+                Yrkesomrade::where('external_id', $yrkesomrade->{'taxonomy/id'})->delete();
+                return true;
+            }
+
             Yrkesomrade::updateOrCreate(['external_id' => $yrkesomrade->{'taxonomy/id'}], [
                 'source' => 'Arbetsförmedlingen',
                 'external_id' => $yrkesomrade->{'taxonomy/id'},
@@ -79,9 +91,34 @@ class ApiImporter implements ImporterInterface
     /**
      * @return $this
      */
+    public function insertRegioner()
+    {
+        $this->regioner->each(function ($region) {
+            if (array_key_exists('taxonomy/deprecated', $region)) {
+                Region::where('external_id', $region->{'taxonomy/id'})->delete();
+                return true;
+            }
+
+            Region::updateOrCreate(['external_id' => $region->{'taxonomy/id'}], [
+                'external_id' => $region->{'taxonomy/id'},
+                'name' => $region->{'taxonomy/preferred-label'},
+            ]);
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function insertYrkesbenamningar()
     {
         $this->yrkesbenamningar->each(function ($yrkesbenamning) {
+            if (array_key_exists('taxonomy/deprecated', $yrkesbenamning)) {
+                Yrkesbenamning::where('external_id', $yrkesbenamning->{'taxonomy/id'})->delete();
+                return true;
+            }
+
             Yrkesbenamning::updateOrCreate(['external_id' => $yrkesbenamning->{'taxonomy/id'}], [
                 'external_id' => $yrkesbenamning->{'taxonomy/id'},
                 'name' => $yrkesbenamning->{'taxonomy/preferred-label'},
@@ -116,6 +153,11 @@ class ApiImporter implements ImporterInterface
     {
         $this->yrkesgrupper->each(function ($yrkesgrupp) {
 
+            if (array_key_exists('taxonomy/deprecated', $yrkesgrupp)) {
+                Yrkesbenamning::where('external_id', $yrkesgrupp->{'taxonomy/id'})->delete();
+                return true;
+            }
+
             // Update or create yrkesgrupp
             $yrkesgrupp = Yrkesgrupp::updateOrCreate(['external_id' => $yrkesgrupp->{'taxonomy/id'}], [
                 'ssyk' => $yrkesgrupp->{'taxonomy/ssyk-code-2012'},
@@ -125,7 +167,7 @@ class ApiImporter implements ImporterInterface
 
             $yrkesomraden = $this->getYrkesomradenFromMapping($yrkesgrupp->external_id);
             $yrkesbenamingar = $this->getYrkesbenamningarFromMapping($yrkesgrupp->external_id);
-            
+
             // Sync yrkesgrupp to yrkesområde, and also yrkesbenämningar
             $yrkesgrupp->yrkesomraden()->syncWithoutDetaching($yrkesomraden->pluck('id'));
             $yrkesgrupp->yrkesbenamningar()->syncWithoutDetaching($yrkesbenamingar->pluck('id'));
@@ -142,6 +184,7 @@ class ApiImporter implements ImporterInterface
         $this->yrkesomraden = $this->fetchYrkesomraden();
         $this->yrkesgrupper = $this->fetchYrkesgrupper();
         $this->yrkesbenamningar = $this->fetchYrkesbenamningar();
+        $this->regioner = $this->fetchRegioner();
 
         // Get mappings
         $this->yrkesomradenYrkesgrupperMapping = $this->fetchYrkesgrupperYrkesomradenMapping();
@@ -178,6 +221,29 @@ class ApiImporter implements ImporterInterface
 
         $res = $this->client->get('specific/concepts/ssyk', [
             'query' => $params
+        ]);
+
+        return collect(json_decode($res->getBody()));
+    }
+
+    public function fetchRegioner()
+    {
+        // First fetch the id for Sverige
+        $res = $this->client->get('main/concepts', [
+            'query' => [
+                'type' => 'country',
+                'preferred-label' => 'Sverige'
+            ]
+        ]);
+
+        $country = collect(json_decode($res->getBody()))->first();
+
+        // Fetch the regions in Sverige
+        $res = $this->client->get('main/concepts', [
+            'query' => [
+                'related-ids' => $country->{'taxonomy/id'},
+                'relation' => 'narrower'
+            ]
         ]);
 
         return collect(json_decode($res->getBody()));

@@ -3,11 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class Yrkesomrade extends Model
 {
-    use HasRelationships;
+    use HasRelationships, SoftDeletes;
 
     protected $table = 'yrkesomraden';
 
