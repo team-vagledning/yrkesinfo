@@ -2,19 +2,22 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
+use App\Importers\JobSearch\Api\ApiImporter;
 use App\Modules\Yrkesstatistik\Collection;
 use App\Modules\Yrkesstatistik\Entry;
 use App\Region;
 use App\Yrkesgrupp;
-use App\Yrkesomrade;
-use App\YrkesstatistikAggregated;
-use Arr;
-use GuzzleHttp\Client;
-use Str;
 
 class YrkesgruppAggregator extends BaseAggregator
 {
     const YEAR = '2017';
+
+    private $jobSearchApi;
+
+    public function __construct(ApiImporter $jobSearchApi)
+    {
+        $this->jobSearchApi = $jobSearchApi;
+    }
 
     public function run()
     {
@@ -23,16 +26,24 @@ class YrkesgruppAggregator extends BaseAggregator
         $yrkesgrupper = Yrkesgrupp::get();
 
         foreach ($yrkesgrupper as $yrkesgrupp) {
-
             $regioner = resolve(Region::class)->get()->map(function ($region) use ($yrkesgrupp) {
+
+                $this->jobSearchApi->addAsyncSearch('yrkesgrupp', $yrkesgrupp->external_id, $region->external_id);
+
                 return [
                     'id' => $region->external_id,
                     'namn' => $region->name,
                     'anstallda' => 0,
-                    'ledigaJobb' => $this->getNumOfAdsFromPlatsbanken($yrkesgrupp->ssyk, $region->external_id),
+                    'ledigaJobb' => 0,
                     'bristindex' => $this->getBristindexForRegion($yrkesgrupp, $region->id)
                 ];
             })->toArray();
+
+            $this->jobSearchApi->unwrap();
+
+            foreach ($regioner as $key => $values) {
+                $regioner[$key]['ledigaJobb'] = $this->jobSearchApi->getCount($yrkesgrupp->external_id, $values['id']);
+            }
 
             $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->orderBy('created_at', 'desc')->first();
 
@@ -72,7 +83,7 @@ class YrkesgruppAggregator extends BaseAggregator
                 "anstallda" => $anstallda,
                 "sektorer" => $sektorer,
                 "bristindex" => $this->getBristindex($yrkesgrupp),
-                "ledigaJobb" => $this->getNumOfAdsFromPlatsbanken($yrkesgrupp->ssyk),
+                "ledigaJobb" => $this->getNumOfAdsFromPlatsbanken($yrkesgrupp->external_id),
                 "regioner" => $regioner,
             ];
 
@@ -83,57 +94,10 @@ class YrkesgruppAggregator extends BaseAggregator
         }
     }
 
-    public function getNumOfAdsFromPlatsbanken($ssyk, $regionId = false)
+    public function getNumOfAdsFromPlatsbanken($taxonomyId, $regionId = false)
     {
-        $results = [];
-
-        $baseUrl = "https://www.arbetsformedlingen.se/rest/pbapi/af/v1/matchning/matchandeRekryteringsbehov";
-        $payload = [
-            "matchningsprofil" => [
-                "profilkriterier" => [
-                    [
-                        "varde" => "**",
-                        "namn" => "**",
-                        "typ" => "FRITEXT"
-                    ],
-                    [
-                        "varde" => $ssyk,
-                        "namn" => "",
-                        "typ" => "YRKESGRUPP_ROLL"
-                    ]
-                ]
-            ],
-            "sorteringsordning" => "RELEVANS",
-            "startrad" => 0,
-            "maxAntal" => 1,
-        ];
-
-        if ($regionId) {
-            // Prepend a zero to regionId, ex. must be 01 and not 1
-            if ($regionId < 10) {
-                $regionId = "0{$regionId}";
-            }
-
-            $payload["matchningsprofil"]["profilkriterier"][] = [
-                "varde" => $regionId,
-                "namn" => "",
-                "typ" => "LAN"
-            ];
-        }
-
-
-
-        try {
-            $client = new Client(['headers' => ['Accept' => 'application/json', 'Accept-Language' => 'sv']]);
-            $response = $client->post($baseUrl, ['json' => $payload]);
-
-            $results = json_decode($response->getBody()->getContents());
-        } catch (\Exception $e) {
-
-            return 0;
-        }
-
-        return data_get($results, 'antalPlatser', 0);
+        return 0;
+        return app(ApiImporter::class)->countYrkesgruppAsync($taxonomyId, $regionId);
     }
 
     public function getBristindex($yrkesgrupp)

@@ -2,6 +2,7 @@
 
 namespace App\Aggregators\Yrkesstatistik;
 
+use App\Importers\JobSearch\Api\ApiImporter;
 use App\Modules\Yrkesstatistik\Collection;
 use App\Region;
 use App\Yrkesomrade;
@@ -13,6 +14,13 @@ use Str;
 class YrkesomradeAggregator extends BaseAggregator
 {
     const YEAR = '2017';
+
+    private $jobSearchApi;
+
+    public function __construct(ApiImporter $jobSearchApi)
+    {
+        $this->jobSearchApi = $jobSearchApi;
+    }
 
     public function run()
     {
@@ -42,14 +50,23 @@ class YrkesomradeAggregator extends BaseAggregator
             $utbildningsstege = [];
 
             $regioner = resolve(Region::class)->get()->map(function ($region) use ($yrkesomrade) {
+
+                $this->jobSearchApi->addAsyncSearch('yrkesomrade', $yrkesomrade->external_id, $region->external_id);
+
                 return [
                     'id' => $region->external_id,
                     'namn' => $region->name,
                     'anstallda' => 0,
-                    'ledigaJobb' => $this->getNumOfAdsFromPlatsbanken($yrkesomrade->external_id, $region->external_id),
+                    'ledigaJobb' => 0,
                     'bristindex' => $this->getBristindexForRegion($yrkesomrade, $region->id)
                 ];
             })->toArray();
+
+            $this->jobSearchApi->unwrap();
+
+            foreach ($regioner as $key => $values) {
+                $regioner[$key]['ledigaJobb'] = $this->jobSearchApi->getCount($yrkesomrade->external_id, $values['id']);
+            }
 
             foreach ($yrkesomrade->yrkesgrupper as $yrkesgrupp) {
                 $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->orderBy('created_at', 'desc')->first();
@@ -183,25 +200,6 @@ class YrkesomradeAggregator extends BaseAggregator
             // Remove .typ from the key
             return substr($key, 0, -4);
         });
-    }
-
-    public function getNumOfAdsFromPlatsbanken($yrkesomradeId, $regionId)
-    {
-        $results = [];
-
-        try {
-            $url = "https://api.arbetsformedlingen.se/af/v0/platsannonser/matchning?lanid={$regionId}&yrkesomradeid={$yrkesomradeId}";
-
-            $client = new Client(['headers' => ['Accept' => 'application/json', 'Accept-Language' => 'sv']]);
-            $response = $client->get($url);
-
-            $results = json_decode($response->getBody()->getContents());
-        } catch (\Exception $e) {
-
-            return 0;
-        }
-
-        return data_get($results, 'matchningslista.antal_platsannonser');
     }
 
     public function getBristindex($yrkesomrade)
