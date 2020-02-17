@@ -42,7 +42,7 @@ class YrkesgruppAggregator extends BaseAggregator
             $this->jobSearchApi->unwrap();
 
             foreach ($regioner as $key => $values) {
-                $regioner[$key]['ledigaJobb'] = $this->jobSearchApi->getCount($yrkesgrupp->external_id, $values['id']);
+                $regioner[$key]['ledigaJobb'] = $this->jobSearchApi->getAsyncCount($yrkesgrupp->external_id, $values['id']);
             }
 
             $aggregated = $yrkesgrupp->yrkesstatistikAggregated()->orderBy('created_at', 'desc')->first();
@@ -83,7 +83,7 @@ class YrkesgruppAggregator extends BaseAggregator
                 "anstallda" => $anstallda,
                 "sektorer" => $sektorer,
                 "bristindex" => $this->getBristindex($yrkesgrupp),
-                "ledigaJobb" => $this->getNumOfAdsFromPlatsbanken($yrkesgrupp->external_id),
+                "ledigaJobb" => $this->jobSearchApi->getCount('yrkesgrupp', $yrkesgrupp->external_id),
                 "regioner" => $regioner,
             ];
 

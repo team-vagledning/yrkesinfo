@@ -55,13 +55,24 @@ class ApiImporter
         ]);
     }
 
+
+
     public function unwrap()
     {
         $this->responses = Promise\unwrap($this->promises);
         $this->promises = [];
     }
 
-    public function getCount($taxonomyId, $regionId)
+    public function getCount($type, $taxonomyId, $regionId = false)
+    {
+        $results = $this->client->get('search', [
+            'query' => $this->params($type, $taxonomyId, $regionId)
+        ]);
+
+        return data_get(json_decode($results->getBody()), 'total.value', 0);
+    }
+
+    public function getAsyncCount($taxonomyId, $regionId)
     {
         return data_get(json_decode($this->responses[$taxonomyId . $regionId]->getBody()), 'total.value', 0);
     }

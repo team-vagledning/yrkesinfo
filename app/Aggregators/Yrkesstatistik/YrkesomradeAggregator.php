@@ -65,7 +65,7 @@ class YrkesomradeAggregator extends BaseAggregator
             $this->jobSearchApi->unwrap();
 
             foreach ($regioner as $key => $values) {
-                $regioner[$key]['ledigaJobb'] = $this->jobSearchApi->getCount($yrkesomrade->external_id, $values['id']);
+                $regioner[$key]['ledigaJobb'] = $this->jobSearchApi->getAsyncCount($yrkesomrade->external_id, $values['id']);
             }
 
             foreach ($yrkesomrade->yrkesgrupper as $yrkesgrupp) {
@@ -155,6 +155,7 @@ class YrkesomradeAggregator extends BaseAggregator
                 "sektorer" => $this->anstalldaSektorerToArray($anstalldaSektorer),
                 "lon" => $lon,
                 "bristindex" => $this->getBristindex($yrkesomrade),
+                "ledigaJobb" => $this->jobSearchApi->getCount('yrkesomrade', $yrkesomrade->external_id),
                 "regioner" => $regioner,
                 'utbildningsstege' => $utbildningsstege
             ];
