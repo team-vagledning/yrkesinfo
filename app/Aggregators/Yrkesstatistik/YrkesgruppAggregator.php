@@ -94,12 +94,6 @@ class YrkesgruppAggregator extends BaseAggregator
         }
     }
 
-    public function getNumOfAdsFromPlatsbanken($taxonomyId, $regionId = false)
-    {
-        return 0;
-        return app(ApiImporter::class)->countYrkesgruppAsync($taxonomyId, $regionId);
-    }
-
     public function getBristindex($yrkesgrupp)
     {
         return self::round($yrkesgrupp->bristindex()->ettAr()->avg('bristindex'));
