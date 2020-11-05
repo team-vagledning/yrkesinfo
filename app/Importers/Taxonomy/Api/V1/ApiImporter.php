@@ -72,7 +72,7 @@ class ApiImporter implements ImporterInterface
     public function insertYrkesomraden()
     {
         $this->yrkesomraden->each(function ($yrkesomrade) {
-            if (array_key_exists('taxonomy/deprecated', $yrkesomrade)) {
+            if (property_exists($yrkesomrade, 'taxonomy/deprecated')) {
                 Yrkesomrade::where('external_id', $yrkesomrade->{'taxonomy/id'})->delete();
                 return true;
             }
@@ -94,7 +94,7 @@ class ApiImporter implements ImporterInterface
     public function insertRegioner()
     {
         $this->regioner->each(function ($region) {
-            if (array_key_exists('taxonomy/deprecated', $region)) {
+            if (property_exists($region, 'taxonomy/deprecated')) {
                 Region::where('external_id', $region->{'taxonomy/id'})->delete();
                 return true;
             }
@@ -114,7 +114,7 @@ class ApiImporter implements ImporterInterface
     public function insertYrkesbenamningar()
     {
         $this->yrkesbenamningar->each(function ($yrkesbenamning) {
-            if (array_key_exists('taxonomy/deprecated', $yrkesbenamning)) {
+            if (property_exists($yrkesbenamning, 'taxonomy/deprecated')) {
                 Yrkesbenamning::where('external_id', $yrkesbenamning->{'taxonomy/id'})->delete();
                 return true;
             }
@@ -153,7 +153,7 @@ class ApiImporter implements ImporterInterface
     {
         $this->yrkesgrupper->each(function ($yrkesgrupp) {
 
-            if (array_key_exists('taxonomy/deprecated', $yrkesgrupp)) {
+            if (property_exists($yrkesgrupp, 'taxonomy/deprecated')) {
                 Yrkesbenamning::where('external_id', $yrkesgrupp->{'taxonomy/id'})->delete();
                 return true;
             }
