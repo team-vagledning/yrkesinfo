@@ -42,6 +42,47 @@ class MapOldYrkesinfoId extends Command
         $oldYrkesomraden = json_decode(file_get_contents($url));
 
         foreach ($oldYrkesomraden as $oldYrkesomrade) {
+
+            // Fix for Hantverksyrken
+            if ($oldYrkesomrade->namn == "Hantverksyrken") {
+                $oldYrkesomrade->namn = "Hantverk";
+            }
+
+            // Fix för Militärt arbete
+            if ($oldYrkesomrade->namn == "Militärt arbete") {
+                $oldYrkesomrade->namn = "Militära yrken";
+            }
+
+            // Fix för Naturvetenskapligt arbete
+            if ($oldYrkesomrade->namn == "Naturvetenskapligt arbete") {
+                $oldYrkesomrade->namn = "Naturvetenskap";
+            }
+
+            // Fix för Pedagogiskt arbete
+            if ($oldYrkesomrade->namn == "Pedagogiskt arbete") {
+                $oldYrkesomrade->namn = "Pedagogik";
+            }
+
+            // Fix för Socialt arbete
+            if ($oldYrkesomrade->namn == "Socialt arbete") {
+                $oldYrkesomrade->namn = "Yrken med social inriktning";
+            }
+
+            // Fix för Säkerhetsarbete
+            if ($oldYrkesomrade->namn == "Säkerhetsarbete") {
+                $oldYrkesomrade->namn = "Säkerhet och bevakning";
+            }
+
+            // Fix för Tekniskt arbete
+            if ($oldYrkesomrade->namn == "Tekniskt arbete") {
+                $oldYrkesomrade->namn = "Yrken med teknisk inriktning";
+            }
+
+            // Fix för Transport
+            if ($oldYrkesomrade->namn == "Transport") {
+                $oldYrkesomrade->namn = "Transport, distribution, lager";
+            }
+
             $yrkesomrade = Yrkesomrade::where('name', $oldYrkesomrade->namn)->first();
 
             if (! $yrkesomrade) {
