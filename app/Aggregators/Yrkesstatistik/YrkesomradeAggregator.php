@@ -215,6 +215,6 @@ class YrkesomradeAggregator extends BaseAggregator
 
     public static function round($value)
     {
-        return number_format(round($value, 2), 2, '.', '');
+        return (float) number_format(round($value, 2), 2, '.', '');
     }
 }

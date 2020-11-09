@@ -56,8 +56,8 @@ class Yrkesomrade extends Model
 
     public function getBristindexAttribute()
     {
-        $femAr = round_number($this->bristindex()->femAr()->avg('bristindex'));
-        $ettAr = round_number($this->bristindex()->ettAr()->avg('bristindex'));
+        $femAr = (float) round_number($this->bristindex()->femAr()->avg('bristindex'));
+        $ettAr = (float) round_number($this->bristindex()->ettAr()->avg('bristindex'));
 
         return [
             'fem_ar' => [
