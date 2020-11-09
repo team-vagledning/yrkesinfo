@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\BristindexYrkesgrupp;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\YrkesomradeCollection;
 use App\Yrkesgrupp;
 use App\Yrkesomrade;
 use App\Http\Resources\Yrkesomrade as YrkesomradeResource;
@@ -12,14 +13,18 @@ class YrkesomradenController extends Controller
 {
     public function index()
     {
-        $yrkesomraden = Yrkesomrade::all('id', 'name', 'external_id', 'description');
+        $yrkesomraden = Yrkesomrade::all();
 
-        return response()->json($yrkesomraden);
+        return new YrkesomradeCollection($yrkesomraden);
     }
 
-    public function show($externalId)
+    public function show($id)
     {
-        $yrkesomrade = Yrkesomrade::where('external_id', $externalId)->with('yrkesgrupper')->first();
+        $yrkesomrade = Yrkesomrade::where('id', $id)->with('yrkesgrupper')->first();
+
+        if (!$yrkesomrade) {
+            abort(404);
+        }
 
         return new YrkesomradeResource($yrkesomrade);
     }
