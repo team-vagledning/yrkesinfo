@@ -30,6 +30,10 @@ class YrkesgrupperController extends Controller
     {
         $yrkesgrupp = Yrkesgrupp::where('ssyk', $ssyk)->first();
 
+        if (!$yrkesgrupp) {
+            abort(404);
+        }
+
         // Fetch the first yrkesomrade, fine for now
         $yrkesomrade = $yrkesgrupp->yrkesomraden()->first();
 

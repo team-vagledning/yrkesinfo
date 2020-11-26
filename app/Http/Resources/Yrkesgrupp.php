@@ -16,6 +16,7 @@ class Yrkesgrupp extends JsonResource
     {
         return [
             'id' => $this->id,
+            'yrkesomrade_id' => $this->yrkesomraden()->first()->id,
             'ssyk' => $this->ssyk,
             'alternative_ssyk' => $this->alternative_ssyk,
             'name' => $this->name,
