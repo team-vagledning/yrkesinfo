@@ -35,7 +35,7 @@ class ApiImporter
                 $params['occupation-field'] = $taxonomyId;
                 break;
             case 'yrkesgrupp':
-                $params['occupation-grouo'] = $taxonomyId;
+                $params['occupation-group'] = $taxonomyId;
                 break;
             default:
                 throw new \Exception("Not a valid JobSearch type");
