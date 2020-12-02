@@ -65,6 +65,32 @@ class YrkesgruppAggregator extends BaseAggregator
                 ];
             });
 
+            // Löner
+            $lon = [
+                'medel' => 0,
+                'percentil10' => 0,
+                'percentil90' => 0,
+            ];
+
+
+            $lon['medel'] = $collection->findFirstByKeysAndKeyValues(
+                ["Lön", "Sektor", "Kön", "År"],
+                [ScbFormatter::$sektioner['0'], ScbFormatter::$kon['1+2'], $YEAR],
+                'Medel'
+            )->getValue();
+
+            $lon['percentil10'] = $collection->findFirstByKeysAndKeyValues(
+                ["Lön", "Sektor", "Kön", "År"],
+                [ScbFormatter::$sektioner['0'], ScbFormatter::$kon['1+2'], $YEAR],
+                'MedelPercentile10'
+            )->getValue();
+
+            $lon['percentil90'] = $collection->findFirstByKeysAndKeyValues(
+                ["Lön", "Sektor", "Kön", "År"],
+                [ScbFormatter::$sektioner['0'], ScbFormatter::$kon['1+2'], $YEAR],
+                'MedelPercentile90'
+            )->getValue();
+
 
             // Karta
             foreach ($regioner as $key => $values) {
@@ -82,6 +108,7 @@ class YrkesgruppAggregator extends BaseAggregator
             $r = [
                 "anstallda" => $anstallda,
                 "sektorer" => $sektorer,
+                "lon" => $lon,
                 "bristindex" => $this->getBristindex($yrkesgrupp),
                 "ledigaJobb" => $this->jobSearchApi->getCount('yrkesgrupp', $yrkesgrupp->external_id),
                 "regioner" => $regioner,

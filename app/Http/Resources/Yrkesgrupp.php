@@ -21,6 +21,7 @@ class Yrkesgrupp extends JsonResource
             'alternative_ssyk' => $this->alternative_ssyk,
             'name' => $this->name,
             'description' => $this->description,
+            'loner' => $this->aggregated_statistics['lon'],
             'anstallda' => $this->aggregated_statistics['anstallda'],
             'sektorer' => $this->aggregated_statistics['sektorer'],
             'bristindex' => $this->aggregated_statistics['bristindex'],
