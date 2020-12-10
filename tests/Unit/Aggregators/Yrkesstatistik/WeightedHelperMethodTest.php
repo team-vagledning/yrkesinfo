@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Aggregators\Yrkesstatistik;
+namespace Tests\Unit\Aggregators\Yrkesstatistik;
 
 use App\Aggregators\Yrkesstatistik\BaseAggregator;
 use ErrorException;
