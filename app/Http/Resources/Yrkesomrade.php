@@ -27,7 +27,7 @@ class Yrkesomrade extends JsonResource
             'sektorer' => $this->aggregated_statistics['sektorer'],
             'regioner' => $this->aggregated_statistics['regioner'],
             'utbildningsstege' => $this->aggregated_statistics['utbildningsstege'],
-            'bristindex' => $this->bristindex,
+            'bristindex' => $this->getBristindexes(),
             'yrkesgrupper'=> YrkesgruppResource::collection($this->whenLoaded('yrkesgrupper')),
         ];
     }
