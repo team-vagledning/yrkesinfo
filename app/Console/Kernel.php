@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AggregateYrkesomraden;
 use App\Console\Commands\ImportTaxonomy;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -28,7 +29,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command(ImportTaxonomy::class)->everyMinute();
+        //$schedule->command(ImportTaxonomy::class)->everyMinute();
+        $schedule->command(AggregateYrkesomraden::class)->dailyAt('13:15');
     }
 
     /**
