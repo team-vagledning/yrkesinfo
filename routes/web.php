@@ -10,10 +10,3 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
-
-    Cache::put('test', 'Something!');
-
-    dd(Cache::get('test'));
-});

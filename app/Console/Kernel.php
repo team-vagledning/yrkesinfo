@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AggregateYrkesgrupper;
 use App\Console\Commands\AggregateYrkesomraden;
 use App\Console\Commands\ImportTaxonomy;
 use Illuminate\Console\Scheduling\Schedule;
@@ -30,6 +31,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //$schedule->command(ImportTaxonomy::class)->everyMinute();
+        $schedule->command(AggregateYrkesgrupper::class)->everyMinute()->onOneServer();
         $schedule->command(AggregateYrkesomraden::class)->everyMinute()->onOneServer();
     }
 
