@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //$schedule->command(ImportTaxonomy::class)->everyMinute();
-        $schedule->command(AggregateYrkesomraden::class)->dailyAt('13:15');
+        $schedule->command(AggregateYrkesomraden::class)->everyMinute()->onOneServer();
     }
 
     /**
