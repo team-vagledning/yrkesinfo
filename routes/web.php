@@ -12,5 +12,8 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+
+    Cache::put('test', 'Something!');
+
+    dd(Cache::get('test'));
 });
