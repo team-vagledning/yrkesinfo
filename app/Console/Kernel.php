@@ -31,8 +31,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //$schedule->command(ImportTaxonomy::class)->everyMinute();
-        //$schedule->command(AggregateYrkesgrupper::class)->everyMinute()->onOneServer();
-        //$schedule->command(AggregateYrkesomraden::class)->everyMinute()->onOneServer();
+        $schedule->command(AggregateYrkesgrupper::class)->everyMinute()->withoutOverlapping()->onOneServer();
+        $schedule->command(AggregateYrkesomraden::class)->everyMinute()->withoutOverlapping()->onOneServer();
     }
 
     /**
