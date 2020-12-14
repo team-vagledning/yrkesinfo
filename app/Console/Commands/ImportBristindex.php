@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Importers\Bristindex\ApiImporter;
 use App\Importers\Bristindex\EttArImport;
 use App\Importers\Bristindex\FemArImport;
 use Illuminate\Console\Command;
@@ -40,7 +41,8 @@ class ImportBristindex extends Command
      */
     public function handle()
     {
-        Excel::import(new FemArImport, storage_path('imports/bristindex/5-ar.xlsx'));
-        Excel::import(new EttArImport, storage_path('imports/bristindex/1-ar.xlsx'));
+        //Excel::import(new FemArImport, storage_path('imports/bristindex/5-ar.xlsx'));
+        //Excel::import(new EttArImport, storage_path('imports/bristindex/1-ar.xlsx'));
+        app(ApiImporter::class)->run();
     }
 }
