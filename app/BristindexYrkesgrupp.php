@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class BristindexYrkesgrupp extends Model
@@ -13,10 +14,10 @@ class BristindexYrkesgrupp extends Model
     public static $ranges = [
         'Saknas' => [0, 1],
         'Väldigt hård konkurrens' => [1, 1.99],
-        'Hård konkurrens' => [2, 2.9],
+        'Hård konkurrens' => [1.99, 2.9],
         'Måttlig konkurrens' => [2.9, 3.3],
         'Liten konkurrens' => [3.3, 4],
-        'Väldigt liten konkurrens' => [4, 5],
+        'Väldigt liten konkurrens' => [4, 5.1],
     ];
 
     public static function bristindexToText(float $bristindex)
@@ -26,8 +27,28 @@ class BristindexYrkesgrupp extends Model
                 return $text;
             }
         }
-        
+
         return self::$ranges[0];
+    }
+
+    public static function mostCommonBristindex(Collection $bristindexes)
+    {
+        $count = collect(self::$ranges)->mapWithKeys(function ($item, $key) {
+            return [$key => 0];
+        });
+
+        $bristindexes->each(function ($bristindex) use ($count) {
+            $count[self::bristindexToText($bristindex->bristindex)] += 1;
+        });
+
+        $mostCommon = $count->sort(function ($a, $b) {
+            return $a < $b;
+        });
+
+        return [
+            'text' => $mostCommon->keys()->first(),
+            'count' => $mostCommon->first(),
+        ];
     }
 
     public function region()

@@ -20,7 +20,7 @@ class YrkesomradeCollection extends ResourceCollection
                'name' => $yrkesomrade->name,
                'external_id' => $yrkesomrade->external_id,
                'description' => $yrkesomrade->description,
-               'bristindex' => $yrkesomrade->bristindex,
+               'bristindex' => $yrkesomrade->getBristindexes(),
                'anstallda' => $yrkesomrade->aggregated_statistics['anstallda'],
            ];
         })->toArray();

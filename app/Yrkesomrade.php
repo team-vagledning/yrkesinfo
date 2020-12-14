@@ -54,19 +54,35 @@ class Yrkesomrade extends Model
         return $query->whereSource('Arbetsförmedlingen')->whereExternalId($optionalId);
     }
 
-    public function getBristindexAttribute()
+    public function getBristindexes($regionId = false)
     {
-        $femAr = (float) round_number($this->bristindex()->femAr()->avg('bristindex'));
-        $ettAr = (float) round_number($this->bristindex()->ettAr()->avg('bristindex'));
+        $femAr = $this->bristindex()->femAr()->get();
+        $ettAr = $this->bristindex()->ettAr()->when($regionId, function ($query, $regionId) {
+            $query->where('region_id', $regionId);
+        })->get();
+
+        $commonFemAr = BristindexYrkesgrupp::mostCommonBristindex($femAr);
+        $commonEttAr = BristindexYrkesgrupp::mostCommonBristindex($ettAr);
+
+        $femArValue = BristindexYrkesgrupp::$ranges[$commonFemAr['text']][0];
+        $ettArValue = BristindexYrkesgrupp::$ranges[$commonEttAr['text']][0];
+
+        $femArTextToLower = strtolower($commonFemAr['text']);
+        $ettArTextToLower = strtolower($commonEttAr['text']);
+
+        $forklarandeFemAr = "Utifrån {$femAr->count()} yrkesprognoser så har {$commonFemAr['count']} st {$femArTextToLower}";
+        $forklarandeEttAr = "Utifrån {$ettAr->count()} yrkesprognoser så har {$commonEttAr['count']} st {$ettArTextToLower}";
 
         return [
             'fem_ar' => [
-                'varde' => $femAr,
-                'text' => BristindexYrkesgrupp::bristindexToText($femAr),
+                'varde' => $femArValue,
+                'text' => $commonFemAr['text'],
+                'forklarandeText' => $forklarandeFemAr,
             ],
             'ett_ar' => [
-                'varde' => $ettAr,
-                'text' => BristindexYrkesgrupp::bristindexToText($ettAr),
+                'varde' => $ettArValue,
+                'text' => $commonEttAr['text'],
+                'forklarandeText' => $forklarandeEttAr,
             ]
         ];
     }

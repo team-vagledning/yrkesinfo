@@ -58,7 +58,7 @@ class YrkesomradeAggregator extends BaseAggregator
                     'namn' => $region->name,
                     'anstallda' => 0,
                     'ledigaJobb' => 0,
-                    'bristindex' => $this->getBristindexForRegion($yrkesomrade, $region->id)
+                    'bristindex' => $yrkesomrade->getBristindexes($region->id)['ett_ar']['varde'],
                 ];
             })->toArray();
 
@@ -154,7 +154,7 @@ class YrkesomradeAggregator extends BaseAggregator
                 "anstallda" => $antalAnstallda,
                 "sektorer" => $this->anstalldaSektorerToArray($anstalldaSektorer),
                 "lon" => $lon,
-                "bristindex" => $this->getBristindex($yrkesomrade),
+                "bristindex" => $yrkesomrade->getBristindexes()['ett_ar']['varde'],
                 "ledigaJobb" => $this->jobSearchApi->getCount('yrkesomrade', $yrkesomrade->external_id),
                 "regioner" => $regioner,
                 'utbildningsstege' => $utbildningsstege
