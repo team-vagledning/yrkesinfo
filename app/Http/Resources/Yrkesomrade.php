@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Yrkesgrupp as YrkesgruppResource;
+use App\Http\Resources\Text as TextResource;
 
 class Yrkesomrade extends JsonResource
 {
@@ -21,6 +22,7 @@ class Yrkesomrade extends JsonResource
             'old_yrkesinfo_id' => $this->extras['old_yrkesinfo_id'],
             'name' => $this->name,
             'description' => $this->description,
+            'texter' => TextResource::collection($this->whenLoaded('texts')),
             'loner' => $this->aggregated_statistics['lon'],
             'ledigaJobb' => $this->aggregated_statistics['ledigaJobb'],
             'anstallda' => $this->aggregated_statistics['anstallda'],
