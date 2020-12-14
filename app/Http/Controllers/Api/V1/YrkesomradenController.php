@@ -20,7 +20,7 @@ class YrkesomradenController extends Controller
 
     public function show($id)
     {
-        $yrkesomrade = Yrkesomrade::where('id', $id)->with('yrkesgrupper')->first();
+        $yrkesomrade = Yrkesomrade::where('id', $id)->with('yrkesgrupper', 'texts')->first();
 
         if (!$yrkesomrade) {
             abort(404);
