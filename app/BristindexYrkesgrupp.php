@@ -12,12 +12,12 @@ class BristindexYrkesgrupp extends Model
     protected $guarded = [];
 
     public static $ranges = [
-        'Saknas' => [0, 1],
-        'Väldigt hård konkurrens' => [1, 1.99],
-        'Hård konkurrens' => [1.99, 2.9],
-        'Måttlig konkurrens' => [2.9, 3.3],
-        'Liten konkurrens' => [3.3, 4],
-        'Väldigt liten konkurrens' => [4, 5.1],
+        'Saknas' => [0, 1, 0],
+        'Väldigt hård konkurrens' => [1, 1.99, 5],
+        'Hård konkurrens' => [1.99, 2.9, 4],
+        'Måttlig konkurrens' => [2.9, 3.3, 3],
+        'Liten konkurrens' => [3.3, 4, 2],
+        'Väldigt liten konkurrens' => [4, 5.1, 1],
     ];
 
     public static function bristindexToText(float $bristindex)

@@ -65,7 +65,10 @@ class Yrkesomrade extends Model
         $commonEttAr = BristindexYrkesgrupp::mostCommonBristindex($ettAr);
 
         $femArValue = BristindexYrkesgrupp::$ranges[$commonFemAr['text']][0];
+        $femArValueInverted = BristindexYrkesgrupp::$ranges[$commonFemAr['text']][2];
+
         $ettArValue = BristindexYrkesgrupp::$ranges[$commonEttAr['text']][0];
+        $ettArValueInverted = BristindexYrkesgrupp::$ranges[$commonEttAr['text']][2];
 
         $femArTextToLower = strtolower($commonFemAr['text']);
         $ettArTextToLower = strtolower($commonEttAr['text']);
@@ -76,11 +79,13 @@ class Yrkesomrade extends Model
         return [
             'fem_ar' => [
                 'varde' => $femArValue,
+                'konkurrensVarde' => $femArValueInverted,
                 'text' => $commonFemAr['text'],
                 'forklarandeText' => $forklarandeFemAr,
             ],
             'ett_ar' => [
                 'varde' => $ettArValue,
+                'konkurrensVarde' => $ettArValueInverted,
                 'text' => $commonEttAr['text'],
                 'forklarandeText' => $forklarandeEttAr,
             ]
