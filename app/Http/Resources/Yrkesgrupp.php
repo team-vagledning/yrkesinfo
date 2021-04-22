@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Yrkesbenamning as YrkesbenamningResource;
 
 class Yrkesgrupp extends JsonResource
 {
@@ -21,6 +22,8 @@ class Yrkesgrupp extends JsonResource
             'alternative_ssyk' => $this->alternative_ssyk,
             'name' => $this->name,
             'description' => $this->description,
+            'search_similarity' => $this->when(isset($this->similarity), $this->similarity),
+            'yrkesbenamningar' => YrkesbenamningResource::collection($this->whenLoaded('yrkesbenamningar')),
             'loner' => $this->aggregated_statistics['lon'],
             'anstallda' => $this->aggregated_statistics['anstallda'],
             'sektorer' => $this->aggregated_statistics['sektorer'],
