@@ -13,7 +13,8 @@ class EnablePgTrgm extends Migration
      */
     public function up()
     {
-        DB::statement(DB::raw('CREATE EXTENSION IF NOT EXISTS pg_trgm'));
+        // Will not unless super user, will this command manually
+        //DB::statement(DB::raw('CREATE EXTENSION IF NOT EXISTS pg_trgm'));
     }
 
     /**
@@ -23,6 +24,6 @@ class EnablePgTrgm extends Migration
      */
     public function down()
     {
-        DB::statement(DB::raw('DROP EXTENSION IF EXISTS pg_trgm'));
+        //DB::statement(DB::raw('DROP EXTENSION IF EXISTS pg_trgm'));
     }
 }
