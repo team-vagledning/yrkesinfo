@@ -12,6 +12,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class YrkesgrupperController extends Controller
 {
@@ -56,16 +57,18 @@ class YrkesgrupperController extends Controller
             abort(400, "Search parameter is missing");
         }
 
-        $cacheKey = "yrkesgrupper.search.$term";
+        // Set a max length for the search term
+        $term = substr($term, 0, 50);
 
+        $cacheKey = "yrkesgrupper.search.$term";
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
 
         $yrkesgrupper = Yrkesgrupp::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
         $yrkesbenamningar = Yrkesbenamning::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
-
         $sortedYrkesgrupper = [];
+
         foreach ($yrkesbenamningar as $yrkesbenamning) {
             $yrkesbenamning->yrkesgrupper->each(function ($yrkesgrupp) use (&$sortedYrkesgrupper, $yrkesbenamning) {
                 array_push($sortedYrkesgrupper, [
