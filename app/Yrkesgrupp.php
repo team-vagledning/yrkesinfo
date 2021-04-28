@@ -44,6 +44,11 @@ class Yrkesgrupp extends Model
         return $this->hasMany(BristindexYrkesgrupp::class, 'yrkesgrupp_id');
     }
 
+    public function sunkoder()
+    {
+        return $this->belongsToMany(Sunkod::class, 'yrkesgrupper_has_sunkoder');
+    }
+
     public function alternativeSsykOrOriginal()
     {
         if (empty($this->alternative_ssyk) === false) {
@@ -51,6 +56,11 @@ class Yrkesgrupp extends Model
         }
 
         return $this->ssyk;
+    }
+
+    public function scopeWhereSsykOrAlternativeSsyk($query, $ssyk)
+    {
+        return $query->whereSsyk($ssyk)->orWhereRaw("alternative_ssyk ?? ?", [$ssyk]);
     }
 
     public static function getByNameSimilarity($term, $similarity = 0.3)

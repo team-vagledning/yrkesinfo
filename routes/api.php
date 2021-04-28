@@ -24,6 +24,7 @@ Route::namespace('Api\V1')->prefix('v1')->group(function () {
 
     Route::get('yrkesomraden/{id}/yrkesgrupper/{ssyk}', 'YrkesgrupperController@showFromYrkesomrade');
 
+    Route::get('yrkesgrupper', 'YrkesgrupperController@index');
     Route::get('yrkesgrupper/search', 'YrkesgrupperController@search');
     Route::get('yrkesgrupper/{ssyk}', 'YrkesgrupperController@show');
 });

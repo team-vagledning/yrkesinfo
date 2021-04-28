@@ -16,6 +16,13 @@ use Illuminate\Support\Facades\Hash;
 
 class YrkesgrupperController extends Controller
 {
+    public function index(Request $request)
+    {
+        $yrkesgrupper = Yrkesgrupp::with('sunkoder')->get();
+
+        return YrkesgruppResource::collection($yrkesgrupper);
+    }
+
     public function showFromYrkesomrade($yrkesomradeId, $ssyk, Request $request)
     {
         // Load from yrkesområde
@@ -34,7 +41,7 @@ class YrkesgrupperController extends Controller
 
     public function show($ssyk, Request $request)
     {
-        $yrkesgrupp = Yrkesgrupp::where('ssyk', $ssyk)->first();
+        $yrkesgrupp = Yrkesgrupp::where('ssyk', $ssyk)->with('sunkoder')->first();
 
         if (!$yrkesgrupp) {
             abort(404);

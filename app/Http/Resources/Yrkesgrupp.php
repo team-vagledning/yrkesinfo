@@ -22,6 +22,7 @@ class Yrkesgrupp extends JsonResource
             'alternative_ssyk' => $this->alternative_ssyk,
             'name' => $this->name,
             'description' => $this->description,
+            'sunkoder' => SunkodCollection::make($this->whenLoaded('sunkoder')),
             'search_similarity' => $this->when(isset($this->similarity), $this->similarity),
             'yrkesbenamningar' => YrkesbenamningResource::collection($this->whenLoaded('yrkesbenamningar')),
             'loner' => $this->aggregated_statistics['lon'],
