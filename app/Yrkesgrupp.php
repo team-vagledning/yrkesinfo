@@ -60,7 +60,7 @@ class Yrkesgrupp extends Model
 
     public function scopeWhereSsykOrAlternativeSsyk($query, $ssyk)
     {
-        return $query->whereSsyk($ssyk)->orWhereRaw("alternative_ssyk ?? ?", [$ssyk]);
+        return $query->whereSsyk($ssyk)->orWhereRaw("jsonb_exists(alternative_ssyk, ?)", [$ssyk]);
     }
 
     public static function getByNameSimilarity($term, $similarity = 0.3)
