@@ -58,6 +58,20 @@ class YrkesgrupperController extends Controller
         return new YrkesgruppResource($yrkesgrupp);
     }
 
+    public function ssyk($ssyk, Request $request)
+    {
+        $yrkesgrupper = Yrkesgrupp::where('ssyk', 'like', $ssyk . '%')->with('sunkoder')->get();
+
+        if ($request->input('withYrkesgrupper')) {
+            foreach ($yrkesgrupper as &$yrkesgrupp) {
+                $yrkesomrade = $yrkesgrupp->yrkesomraden()->first();
+                $yrkesgrupp->siblings = $yrkesomrade->yrkesgrupper()->get();
+            }
+        }
+
+        return YrkesgruppResource::collection($yrkesgrupper);
+    }
+
     public function search(Request $request)
     {
         if (empty($term = $request->input('q'))) {
