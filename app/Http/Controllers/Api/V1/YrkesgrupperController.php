@@ -55,6 +55,11 @@ class YrkesgrupperController extends Controller
             $yrkesgrupp->siblings = $yrkesomrade->yrkesgrupper()->get();
         }
 
+        // Should we populate with old yrkesinfo data
+        if ($request->input('withOldYrkesinfo')) {
+            $yrkesgrupp->old_yrkesinfo = cache()->tags('old-yrkesinfo')->get($yrkesgrupp->ssyk, []);
+        }
+
         return new YrkesgruppResource($yrkesgrupp);
     }
 
@@ -66,6 +71,13 @@ class YrkesgrupperController extends Controller
             foreach ($yrkesgrupper as &$yrkesgrupp) {
                 $yrkesomrade = $yrkesgrupp->yrkesomraden()->first();
                 $yrkesgrupp->siblings = $yrkesomrade->yrkesgrupper()->get();
+            }
+        }
+
+        // Should we populate with old yrkesinfo data
+        if ($request->input('withOldYrkesinfo')) {
+            foreach ($yrkesgrupper as &$yrkesgrupp) {
+                $yrkesgrupp->old_yrkesinfo = cache()->tags('old-yrkesinfo')->get($yrkesgrupp->ssyk, []);
             }
         }
 
