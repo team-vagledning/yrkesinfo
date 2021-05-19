@@ -13,7 +13,7 @@ use Str;
 
 class YrkesomradeAggregator extends BaseAggregator
 {
-    const YEAR = '2018';
+    const YEAR = '2019';
 
     private $jobSearchApi;
 
