@@ -28,4 +28,6 @@ Route::namespace('Api\V1')->prefix('v1')->group(function () {
     Route::get('yrkesgrupper/search', 'YrkesgrupperController@search');
     Route::get('yrkesgrupper/ssyk/{ssyk}', 'YrkesgrupperController@ssyk');
     Route::get('yrkesgrupper/{ssyk}', 'YrkesgrupperController@show');
+
+    Route::get('regioner', 'RegionerController@index');
 });

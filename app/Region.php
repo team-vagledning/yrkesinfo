@@ -9,4 +9,8 @@ class Region extends Model
     protected $table = 'regioner';
 
     protected $guarded = [];
+
+    protected $casts = [
+        'grans' => 'array',
+    ];
 }
