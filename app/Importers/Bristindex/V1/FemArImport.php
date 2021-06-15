@@ -1,33 +1,21 @@
 <?php
 
-namespace App\Importers\Bristindex\EttArSheets;
+namespace App\Importers\Bristindex\V1;
 
 use App\BristindexYrkesgrupp;
-use App\Region;
 use App\Yrkesgrupp;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class FirstSheet implements ToCollection, WithStartRow
+class FemArImport implements ToCollection
 {
-    public const LAN = 0;
-    public const SSYK = 2;
-    public const BRISTINDEX = 4;
-    public const OMFANG = 1;
-
-    public function startRow(): int
-    {
-        return 2;
-    }
+    public const SSYK = 1;
+    public const BRISTINDEX = 3;
+    public const OMFANG = 5;
 
     public function collection(Collection $collection)
     {
         foreach ($collection as $row) {
-            $regionName = substr($row[self::LAN], stripos($row[self::LAN], ' ') + 1);
-            
-            $region = Region::where('name', $regionName)->first();
             $yrkesgrupper = Yrkesgrupp::where('ssyk', 'like', (string) $row[self::SSYK] . '%')->get();
 
             // Do nothing if bristindex is non numeric
@@ -37,7 +25,7 @@ class FirstSheet implements ToCollection, WithStartRow
 
             foreach ($yrkesgrupper as $yrkesgrupp) {
                 BristindexYrkesgrupp::updateOrCreate([
-                    'region_id' => $region->id,
+                    'region_id' => null,
                     'yrkesgrupp_id' => $yrkesgrupp->id,
                     'omfang' => self::OMFANG,
                 ], [

@@ -123,12 +123,12 @@ class YrkesgruppAggregator extends BaseAggregator
 
     public function getBristindex($yrkesgrupp)
     {
-        return self::round($yrkesgrupp->bristindex()->ettAr()->avg('bristindex'));
+        return self::round($yrkesgrupp->bristindex()->ettAr()->maxArtal()->avg('bristindex'));
     }
 
     public function getBristindexForRegion($yrkesgrupp, $regionId)
     {
-        return self::round($yrkesgrupp->bristindex()->ettAr()->where('region_id', $regionId)->avg('bristindex'));
+        return self::round($yrkesgrupp->bristindex()->ettAr()->maxArtal()->where('region_id', $regionId)->avg('bristindex'));
     }
 
     public static function round($value)

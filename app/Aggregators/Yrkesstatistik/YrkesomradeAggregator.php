@@ -205,12 +205,12 @@ class YrkesomradeAggregator extends BaseAggregator
 
     public function getBristindex($yrkesomrade)
     {
-        return self::round($yrkesomrade->bristindex()->ettAr()->avg('bristindex'));
+        return self::round($yrkesomrade->bristindex()->ettAr()->maxArtal()->avg('bristindex'));
     }
 
     public function getBristindexForRegion($yrkesomrade, $regionId)
     {
-        return self::round($yrkesomrade->bristindex()->ettAr()->where('region_id', $regionId)->avg('bristindex'));
+        return self::round($yrkesomrade->bristindex()->ettAr()->maxArtal()->where('region_id', $regionId)->avg('bristindex'));
     }
 
     public static function round($value)

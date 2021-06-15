@@ -56,8 +56,8 @@ class Yrkesomrade extends Model
 
     public function getBristindexes($regionId = false)
     {
-        $femAr = $this->bristindex()->femAr()->get();
-        $ettAr = $this->bristindex()->ettAr()->when($regionId, function ($query, $regionId) {
+        $femAr = $this->bristindex()->femAr()->maxArtal()->get();
+        $ettAr = $this->bristindex()->ettAr()->maxArtal()->when($regionId, function ($query, $regionId) {
             $query->where('region_id', $regionId);
         })->get();
 

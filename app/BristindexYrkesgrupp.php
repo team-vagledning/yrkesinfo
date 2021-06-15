@@ -4,12 +4,17 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class BristindexYrkesgrupp extends Model
 {
     protected $table = 'bristindex_yrkesgrupp';
 
     protected $guarded = [];
+
+    protected $casts = [
+        'meta' => 'array',
+    ];
 
     public static $ranges = [
         'Saknas' => [0, 1, 0],
@@ -69,5 +74,15 @@ class BristindexYrkesgrupp extends Model
     public function scopeEttAr($query)
     {
         return $query->where('omfang', 1);
+    }
+
+    public function scopeMaxArtal($query)
+    {
+        return $query->where('artal', function($where) {
+            $where
+                ->select(DB::raw("max(artal)"))
+                ->fromRaw("bristindex_yrkesgrupp as j")
+                ->whereRaw("j.omfang = bristindex_yrkesgrupp.omfang");
+        });
     }
 }

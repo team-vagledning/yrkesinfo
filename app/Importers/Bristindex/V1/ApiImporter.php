@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Importers\Bristindex;
+namespace App\Importers\Bristindex\V1;
 
 use App\BristindexYrkesgrupp;
 use App\Importers\ImporterInterface;
