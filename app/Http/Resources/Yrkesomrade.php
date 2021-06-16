@@ -20,6 +20,7 @@ class Yrkesomrade extends JsonResource
             'id' => $this->id,
             'external_id' => $this->external_id,
             'old_yrkesinfo_id' => $this->extras['old_yrkesinfo_id'],
+            'yrkesprognoser' => $this->getYrkesprognoser(),
             'name' => $this->name,
             'description' => $this->description,
             'texter' => TextResource::collection($this->whenLoaded('texts')),

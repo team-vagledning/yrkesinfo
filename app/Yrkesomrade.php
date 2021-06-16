@@ -91,4 +91,24 @@ class Yrkesomrade extends Model
             ]
         ];
     }
+
+    public function getYrkesprognoser()
+    {
+        $ettAr = $this->bristindex()->ettAr()->maxArtal()->get();
+
+        $commonEttAr = BristindexYrkesgrupp::mostCommonBristindex($ettAr);
+
+        $ettArValue = BristindexYrkesgrupp::$ranges[$commonEttAr['text']][0];
+
+        if (count($ettAr) < 1) {
+            return [];
+        }
+
+        return [
+            'varde' => $ettArValue,
+            'artal' => $ettAr->first()->artal,
+            'text' => $commonEttAr['text'],
+            'antalPrognoser' => count($ettAr)
+        ];
+    }
 }
