@@ -94,21 +94,29 @@ class Yrkesomrade extends Model
 
     public function getYrkesprognoser()
     {
+        $res = [];
+
         $ettAr = $this->bristindex()->ettAr()->maxArtal()->get();
+        $femAr = $this->bristindex()->femAr()->maxArtal()->get();
 
-        $commonEttAr = BristindexYrkesgrupp::mostCommonBristindex($ettAr);
-
-        $ettArValue = BristindexYrkesgrupp::$ranges[$commonEttAr['text']][0];
-
-        if (count($ettAr) < 1) {
-            return [];
+        if (count($ettAr)) {
+            $res[] = [
+                'omfang' => 1,
+                'varde' => (float) $ettAr->countBy('bristindex')->sort()->keys()->last(),
+                'artal' => $ettAr->first()->artal,
+                'antalPrognoser' => $ettAr->count(),
+            ];
         }
 
-        return [
-            'varde' => $ettArValue,
-            'artal' => $ettAr->first()->artal,
-            'text' => $commonEttAr['text'],
-            'antalPrognoser' => count($ettAr)
-        ];
+        if (count($femAr)) {
+            $res[] = [
+                'omfang' => 5,
+                'varde' => (float) $femAr->countBy('bristindex')->sort()->keys()->last(),
+                'artal' => $femAr->first()->artal,
+                'antalPrognoser' => $femAr->count(),
+            ];
+        }
+
+        return $res;
     }
 }
