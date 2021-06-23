@@ -85,4 +85,23 @@ class Yrkesgrupp extends Model
 
         return $yrkesgrupper;
     }
+
+    public function getYrkesprognoser()
+    {
+        $res = [];
+
+        $ettAr = $this->bristindex()->ettAr()->maxArtal()->first();
+        $femAr = $this->bristindex()->femAr()->maxArtal()->first();
+
+        if ($ettAr) {
+            array_push($res, $ettAr);
+        }
+
+        if ($femAr) {
+            array_push($res, $femAr);
+        }
+
+
+        return collect($res);
+    }
 }

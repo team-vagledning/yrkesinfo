@@ -56,6 +56,14 @@ class Yrkesomrade extends Model
 
     public function getBristindexes($regionId = false)
     {
+        $cacheKey = "yrkesomrade.bristindex.{$this->id}";
+
+        if (cache()->has($cacheKey)) {
+            return cache()->get($cacheKey);
+        }
+
+        $res = [];
+
         $femAr = $this->bristindex()->femAr()->maxArtal()->get();
         $ettAr = $this->bristindex()->ettAr()->maxArtal()->when($regionId, function ($query, $regionId) {
             $query->where('region_id', $regionId);
@@ -76,7 +84,7 @@ class Yrkesomrade extends Model
         $forklarandeFemAr = "Utifrån {$femAr->count()} yrkesprognoser så har {$commonFemAr['count']} st {$femArTextToLower}";
         $forklarandeEttAr = "Utifrån {$ettAr->count()} yrkesprognoser så har {$commonEttAr['count']} st {$ettArTextToLower}";
 
-        return [
+        $res = [
             'fem_ar' => [
                 'varde' => $femArValue,
                 'konkurrensVarde' => $femArValueInverted,
@@ -90,5 +98,45 @@ class Yrkesomrade extends Model
                 'forklarandeText' => $forklarandeEttAr,
             ]
         ];
+
+        cache()->set($cacheKey, $res, now()->addDay());
+
+        return $res;
+    }
+
+    public function getYrkesprognoser()
+    {
+        $cacheKey = "yrkesomrade.yrkesprognoser.{$this->id}";
+
+        if (cache()->has($cacheKey)) {
+            return cache()->get($cacheKey);
+        }
+
+        $res = [];
+
+        $ettAr = $this->bristindex()->ettAr()->maxArtal()->get();
+        $femAr = $this->bristindex()->femAr()->maxArtal()->get();
+
+        if (count($ettAr)) {
+            $res[] = [
+                'omfang' => 1,
+                'varde' => (float) $ettAr->countBy('bristindex')->sort()->keys()->last(),
+                'artal' => $ettAr->first()->artal,
+                'antalPrognoser' => $ettAr->count(),
+            ];
+        }
+
+        if (count($femAr)) {
+            $res[] = [
+                'omfang' => 5,
+                'varde' => (float) $femAr->countBy('bristindex')->sort()->keys()->last(),
+                'artal' => $femAr->first()->artal,
+                'antalPrognoser' => $femAr->count(),
+            ];
+        }
+
+        cache()->set($cacheKey, $res, now()->addDay());
+
+        return $res;
     }
 }

@@ -21,6 +21,7 @@ class YrkesomradeCollection extends ResourceCollection
                'external_id' => $yrkesomrade->external_id,
                'description' => $yrkesomrade->description,
                'bristindex' => $yrkesomrade->getBristindexes(),
+               'yrkesprognoser' => $yrkesomrade->getYrkesprognoser(),
                'anstallda' => $yrkesomrade->aggregated_statistics['anstallda'],
            ];
         })->toArray();
