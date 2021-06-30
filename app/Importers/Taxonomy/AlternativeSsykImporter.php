@@ -44,8 +44,6 @@ class AlternativeSsykImporter implements ImporterInterface
             '1730' => ['1731', '1732'],
             '1740' => ['1741', '1742'],
             '1790' => ['1791', '1792'],
-            '5321' => ['5322'],
-            '5323' => ['5324'],
         ];
     }
 }
