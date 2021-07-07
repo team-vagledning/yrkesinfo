@@ -16,7 +16,8 @@ class Yrkesgrupp extends Model
 
     protected $casts = [
         'alternative_ssyk' => 'array',
-        'aggregated_statistics' => 'array'
+        'aggregated_statistics' => 'array',
+        'extras' => 'array'
     ];
 
     public function yrkesomraden()

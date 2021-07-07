@@ -3,6 +3,7 @@
 namespace App\Importers\Yrkesinfo\Yrkesgrupper;
 
 use App\Importers\ImporterInterface;
+use App\Yrkesgrupp;
 use GuzzleHttp\Client;
 
 class ApiImporter implements ImporterInterface
@@ -13,6 +14,8 @@ class ApiImporter implements ImporterInterface
 
     protected $promises = [];
     protected $responses = [];
+
+    private $ssykData = [];
 
     public function __construct()
     {
@@ -30,35 +33,29 @@ class ApiImporter implements ImporterInterface
             ]
         ]);
 
-        // Flush the old cache
-        cache()->tags('old-yrkesinfo')->flush();
+        $oldYrkesgrupper = json_decode($results->getBody());
 
-        $yrkesgrupper = json_decode($results->getBody());
-
-        foreach ($yrkesgrupper as $yrkesgrupp) {
-            foreach ($yrkesgrupp->ssyk as $ssyk) {
-                $this->cache($ssyk->ssyk, $yrkesgrupp);
+        foreach ($oldYrkesgrupper as $oldYrkesgrupp) {
+            foreach ($oldYrkesgrupp->ssyk as $ssyk) {
+                $this->ssykData[$ssyk->ssyk][] = $oldYrkesgrupp;
             }
         }
+
+        $this->save();
     }
 
-    public function cache($ssyk, $yrkesgrupp)
+    public function save()
     {
-        $cached = cache()->tags('old-yrkesinfo')->get($ssyk);
-
-        if (!$cached) {
-            $cached = [];
-        }
-
-        // Check if already cached
-        foreach ($cached as $c) {
-            if ($c->id == $yrkesgrupp->id) {
-                return;
+        foreach ($this->ssykData as $ssyk => $data) {
+            $yrkesgrupp = Yrkesgrupp::whereSsykOrAlternativeSsyk($ssyk)->first();
+            if (!$yrkesgrupp) {
+                continue;
             }
+
+            $extras = $yrkesgrupp->extras;
+            $extras['old_yrkesinfo'] = $data;
+
+            $yrkesgrupp->update(['extras' => $extras]);
         }
-
-        array_push($cached, $yrkesgrupp);
-
-        cache()->tags('old-yrkesinfo')->put($ssyk, $cached);
     }
 }

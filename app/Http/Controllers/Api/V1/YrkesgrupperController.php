@@ -54,12 +54,7 @@ class YrkesgrupperController extends Controller
         if ($request->input('withYrkesgrupper')) {
             $yrkesgrupp->siblings = $yrkesomrade->yrkesgrupper()->get();
         }
-
-        // Should we populate with old yrkesinfo data
-        if ($request->input('withOldYrkesinfo')) {
-            $yrkesgrupp->old_yrkesinfo = cache()->tags('old-yrkesinfo')->get($yrkesgrupp->ssyk, []);
-        }
-
+        
         return new YrkesgruppResource($yrkesgrupp);
     }
 
@@ -74,12 +69,6 @@ class YrkesgrupperController extends Controller
             }
         }
 
-        // Should we populate with old yrkesinfo data
-        if ($request->input('withOldYrkesinfo')) {
-            foreach ($yrkesgrupper as &$yrkesgrupp) {
-                $yrkesgrupp->old_yrkesinfo = cache()->tags('old-yrkesinfo')->get($yrkesgrupp->ssyk, []);
-            }
-        }
 
         return YrkesgruppResource::collection($yrkesgrupper);
     }
@@ -93,7 +82,7 @@ class YrkesgrupperController extends Controller
         // Set a max length for the search term
         $term = substr($term, 0, 50);
 
-        $cacheKey = "yrkesgrupper.search.$term";
+        $cacheKey = "yrkesgrupper.search." . md5($term);
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }

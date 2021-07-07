@@ -33,7 +33,7 @@ class Yrkesgrupp extends JsonResource
             'ledigaJobb' => $this->aggregated_statistics['ledigaJobb'],
             'regioner' => $this->aggregated_statistics['regioner'],
             'yrkesgrupper' => self::collection($this->when(isset($this->siblings), $this->siblings)),
-            'old_yrkesinfo' => $this->when(isset($this->old_yrkesinfo), $this->old_yrkesinfo),
+            'old_yrkesinfo' => $this->when($request->input('withOldYrkesinfo'), $this->extras['old_yrkesinfo'] ?? []),
         ];
     }
 }
