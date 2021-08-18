@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\YrkesgruppCollection;
+use App\KeywordedYrkesgruppSearch;
+use App\Services\YrkesgruppService;
 use App\Yrkesbenamning;
 use App\Yrkesgrupp;
 use App\Http\Resources\Yrkesgrupp as YrkesgruppResource;
@@ -13,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class YrkesgrupperController extends Controller
 {
@@ -54,7 +57,7 @@ class YrkesgrupperController extends Controller
         if ($request->input('withYrkesgrupper')) {
             $yrkesgrupp->siblings = $yrkesomrade->yrkesgrupper()->get();
         }
-        
+
         return new YrkesgruppResource($yrkesgrupp);
     }
 
@@ -83,36 +86,17 @@ class YrkesgrupperController extends Controller
         $term = substr($term, 0, 50);
 
         $cacheKey = "yrkesgrupper.search." . md5($term);
-        if (Cache::has($cacheKey)) {
+        if (Cache::has($cacheKey) && ! $request->has('clearCache')) {
             return Cache::get($cacheKey);
         }
 
-        $yrkesgrupper = Yrkesgrupp::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
-        $yrkesbenamningar = Yrkesbenamning::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
-        $sortedYrkesgrupper = [];
-
-        foreach ($yrkesbenamningar as $yrkesbenamning) {
-            $yrkesbenamning->yrkesgrupper->each(function ($yrkesgrupp) use (&$sortedYrkesgrupper, $yrkesbenamning) {
-                array_push($sortedYrkesgrupper, [
-                    'id' => $yrkesgrupp->id,
-                    'similarity' => $yrkesbenamning->similarity,
-                ]);
-            });
+        // Check for keyword search
+        if (Str::startsWith($term, "k:")) {
+            $keyworded = KeywordedYrkesgruppSearch::where('keyword', substr($term, 2))->with('yrkesgrupp')->get();
+            $yrkesgrupper = $keyworded->pluck('yrkesgrupp')->flatten();
+        } else {
+            $yrkesgrupper = app(YrkesgruppService::class)->searchBySimilarity($term);
         }
-
-        foreach ($yrkesgrupper as $yrkesgrupp) {
-            array_push($sortedYrkesgrupper, [
-                'id' => $yrkesgrupp->id,
-                'similarity' => $yrkesgrupp->similarity
-            ]);
-        }
-
-        $sortedYrkesgrupper = collect($sortedYrkesgrupper)->sortByDesc('similarity')->unique('id')->values();
-
-        $yrkesgrupper = Yrkesgrupp::with('yrkesbenamningar')->whereIn('id', $sortedYrkesgrupper->pluck('id'))->get()
-            ->each(function ($yrkesgrupp) use ($sortedYrkesgrupper) {
-                $yrkesgrupp->similarity = (float) $sortedYrkesgrupper->keyBy('id')[$yrkesgrupp->id]['similarity'];
-            })->sortByDesc('similarity')->values()->collect();
 
         $resourceCollection = YrkesgruppResource::collection($yrkesgrupper);
 
