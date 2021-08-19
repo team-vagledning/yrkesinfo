@@ -16,7 +16,7 @@ class Yrkesgrupp implements ImporterInterface
     {
         return [
             [
-                'keyword' => 'barnmoskor',
+                'keyword' => 'barnmorskor',
                 'yrkesgrupper' => [2222]
             ],
             [
