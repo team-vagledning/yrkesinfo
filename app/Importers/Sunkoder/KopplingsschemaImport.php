@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Importers\Bristindex;
+namespace App\Importers\Sunkoder;
 
 use App\BristindexYrkesgrupp;
 use App\Sunkod;
@@ -22,8 +22,7 @@ class KopplingsschemaImport implements ToCollection, WithStartRow
 
     public function collection(Collection $collection)
     {
-        foreach ($collection as $row)
-        {
+        foreach ($collection as $row) {
             $sunkoder = explode(",", $row[self::SUNKOD]);
             $yrkesgrupp = Yrkesgrupp::whereSsykOrAlternativeSsyk($row[self::SSYK])->first();
 
@@ -33,7 +32,6 @@ class KopplingsschemaImport implements ToCollection, WithStartRow
             }
 
             foreach ($sunkoder as $sunkod) {
-
                 $sunkod = trim($sunkod);
 
                 if (empty($sunkod)) {

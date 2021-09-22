@@ -2,7 +2,6 @@
 
 namespace App\Importers\Sunkoder;
 
-use App\Importers\Bristindex\KopplingsschemaImport;
 use App\Importers\ImporterInterface;
 use Maatwebsite\Excel\Facades\Excel;
 

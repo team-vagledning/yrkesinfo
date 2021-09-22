@@ -51,7 +51,7 @@ class ApiImporter implements ImporterInterface
             if (!$yrkesgrupp) {
                 continue;
             }
-            
+
             $extras = $yrkesgrupp->extras;
             $extras['old_yrkesinfo'] = collect($data)->unique('id')->toArray();
 
