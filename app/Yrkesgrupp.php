@@ -50,6 +50,11 @@ class Yrkesgrupp extends Model
         return $this->belongsToMany(Sunkod::class, 'yrkesgrupper_has_sunkoder');
     }
 
+    public function susanavetCourses()
+    {
+        return $this->hasMany(SusanavetCourses::class, 'yrkesgrupp_id');
+    }
+
     public function alternativeSsykOrOriginal()
     {
         if (empty($this->alternative_ssyk) === false) {
