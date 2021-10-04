@@ -52,7 +52,7 @@ class Yrkesgrupp extends Model
 
     public function susanavetCourses()
     {
-        return $this->hasMany(SusanavetCourses::class, 'yrkesgrupp_id');
+        return $this->hasMany(SusanavetCourse::class, 'yrkesgrupp_id');
     }
 
     public function alternativeSsykOrOriginal()

@@ -44,7 +44,7 @@ class YrkesgrupperController extends Controller
 
     public function show($ssyk, Request $request)
     {
-        $yrkesgrupp = Yrkesgrupp::where('ssyk', $ssyk)->with('sunkoder')->first();
+        $yrkesgrupp = Yrkesgrupp::where('ssyk', $ssyk)->with('sunkoder', 'susanavetCourses')->first();
 
         if (!$yrkesgrupp) {
             abort(404);
@@ -63,7 +63,7 @@ class YrkesgrupperController extends Controller
 
     public function ssyk($ssyk, Request $request)
     {
-        $yrkesgrupper = Yrkesgrupp::where('ssyk', 'like', $ssyk . '%')->with('sunkoder')->get();
+        $yrkesgrupper = Yrkesgrupp::where('ssyk', 'like', $ssyk . '%')->with('sunkoder', 'susanavetCourses')->get();
 
         if ($request->input('withYrkesgrupper')) {
             foreach ($yrkesgrupper as &$yrkesgrupp) {
