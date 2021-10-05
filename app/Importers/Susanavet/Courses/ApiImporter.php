@@ -33,10 +33,26 @@ class ApiImporter implements ImporterInterface
                 $matchedSubjects = $this->findSubjectsFromSunkod($subjects, $sunkod->kod);
 
                 foreach ($matchedSubjects as $matchedSubject) {
-                    $info = $this->fetchInfos($matchedSubject);
+                    $events = $this->fetchEvents($matchedSubject);
 
-                    if (count($info) > 0) {
-                        $courses[] = $info;
+                    if (empty($events)) {
+                        continue;
+                    }
+
+                    $handledEducations = [];
+
+                    foreach ($events as $event) {
+                        // Skip already handled courses
+                        $educationCode = $event->content->educationEvent->education;
+                        if (array_key_exists($educationCode, $handledEducations)) {
+                            continue;
+                        }
+
+                        $courses[] = $this->followLinks($event->links);
+                        $handledEducations[$educationCode] = true;
+
+                        // Simple rate limiting
+                        sleep(5);
                     }
                 }
             }
@@ -75,16 +91,37 @@ class ApiImporter implements ImporterInterface
         return $subjects->content;
     }
 
-    private function fetchInfos($subject)
+    private function fetchEvents($subject)
     {
-        $results = $this->client->get('infos?page=0&size=' . self::MAX_FETCH . '&subjectIds=' . $subject->id);
+        $results = $this->client->get('events?page=0&size=' . self::MAX_FETCH . '&subjectIds=' . $subject->id);
 
-        $infos = json_decode($results->getBody());
+        $events = json_decode($results->getBody());
 
-        if ($infos->page->totalElements > self::MAX_FETCH) {
+        if ($events->page->totalElements > self::MAX_FETCH) {
             throw new \Exception("More elements than MAX_FETCH");
         }
 
-        return $infos->content;
+        return $events->content;
+    }
+
+    private function followLinks($links)
+    {
+        $returnResults = [];
+
+        foreach ($links as $link) {
+            $name = $link->rel;
+
+            if ($name == "self") {
+                $name = "events";
+            }
+
+            $results = $this->client->get($link->href);
+
+            $decoded = json_decode($results->getBody());
+
+            $returnResults[$name] = $decoded->content;
+        }
+        
+        return $returnResults;
     }
 }
