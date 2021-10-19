@@ -19,10 +19,25 @@ class SusanavetCourse extends JsonResource
                 'namn' => self::getContent(self::info($course), 'title.string.0.content'),
                 'stad' => self::getContent(self::event($course), 'location.0.town'),
                 'kurskod' => self::getContent(self::info($course), 'code'),
+                'identifierare' => self::getContent(self::info($course), 'identifier'),
                 'beskrivning' => self::getContent(self::info($course), 'description.string.0.content'),
-                'lank' => self::getContent(self::info($course), 'url.url.0.content'),
+                'lank' => self::buildLink(self::getContent(self::info($course), 'identifier')),
+                'utbildningstyp' => self::getContent(self::info($course), 'form.code'),
             ];
+        })->filter(function ($course) {
+            return $course['utbildningstyp'] === 'yrkeshögskoleutbildning';
         })->toArray();
+    }
+
+    public static function buildLink($identifier)
+    {
+        $id = last(explode('.', $identifier));
+
+        if (is_numeric($id) === false) {
+            return '';
+        }
+
+        return "https://www.yrkeshogskolan.se/hitta-utbildning/sok/utbildning/?id={$id}";
     }
 
     public static function info($course)
