@@ -21,7 +21,11 @@ class SusanavetCourse extends JsonResource
                 'kurskod' => self::getContent(self::info($course), 'code'),
                 'identifierare' => self::getContent(self::info($course), 'identifier'),
                 'beskrivning' => self::getContent(self::info($course), 'description.string.0.content'),
-                'lank' => self::buildLink(self::getContent(self::info($course), 'identifier')),
+                'lank' => self::buildLink(
+                    self::getContent(self::info($course), 'identifier'),
+                    self::getContent(self::info($course), 'code'),
+                    self::getContent(self::info($course), 'credits.credits.0')
+                ),
                 'utbildningstyp' => self::getContent(self::info($course), 'form.code'),
             ];
         })->filter(function ($course) {
@@ -29,8 +33,12 @@ class SusanavetCourse extends JsonResource
         })->toArray();
     }
 
-    public static function buildLink($identifier)
+    public static function buildLink($identifier, $code, $credits)
     {
+        if ($credits < 100) {
+            return "https://www.yrkeshogskolan.se/korta-utbildningar/?query={$code}";
+        }
+
         $id = last(explode('.', $identifier));
 
         if (is_numeric($id) === false) {

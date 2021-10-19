@@ -52,7 +52,7 @@ class ApiImporter implements ImporterInterface
                         $handledEducations[$educationCode] = true;
 
                         // Simple rate limiting
-                        sleep(5);
+                        //sleep(5);
                     }
                 }
             }
@@ -62,6 +62,8 @@ class ApiImporter implements ImporterInterface
                     'data' => $courses
                 ]);
             }
+
+            sleep(2);
         }
     }
 
@@ -121,7 +123,7 @@ class ApiImporter implements ImporterInterface
 
             $returnResults[$name] = $decoded->content;
         }
-        
+
         return $returnResults;
     }
 }
