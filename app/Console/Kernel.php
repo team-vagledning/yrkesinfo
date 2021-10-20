@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\AggregateYrkesgrupper;
 use App\Console\Commands\AggregateYrkesomraden;
+use App\Console\Commands\ImportSusanavetCourses;
 use App\Console\Commands\ImportTaxonomy;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -31,9 +32,11 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //$schedule->command(ImportTaxonomy::class)->everyMinute();
-                
+
         $schedule->command(AggregateYrkesgrupper::class)->dailyAt('03:45')->withoutOverlapping()->onOneServer();
         $schedule->command(AggregateYrkesomraden::class)->dailyAt('03:45')->withoutOverlapping()->onOneServer();
+
+        $schedule->command(ImportSusanavetCourses::class)->dailyAt('06:00')->withoutOverlapping()->onOneServer();
     }
 
     /**

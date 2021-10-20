@@ -3,6 +3,7 @@
 namespace App\Importers\Susanavet\Courses;
 
 use App\Importers\ImporterInterface;
+use App\SusanavetCourse;
 use App\Yrkesgrupp;
 use GuzzleHttp\Client;
 
@@ -23,6 +24,10 @@ class ApiImporter implements ImporterInterface
 
     public function run()
     {
+        foreach (SusanavetCourse::all() as $course) {
+            $course->delete();
+        }
+
         $subjects = $this->fetchSubjects();
         $yrkesgrupper = Yrkesgrupp::has('sunkoder')->with('sunkoder')->get();
 
@@ -63,6 +68,7 @@ class ApiImporter implements ImporterInterface
                 ]);
             }
 
+            // Simple rate limiting
             sleep(2);
         }
     }
