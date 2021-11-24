@@ -247,7 +247,7 @@ class ApiImporter implements ImporterInterface
                     }
                   }
                 }
-                GRAPHAQL
+GRAPHAQL
         ];
 
         $res = $this->client->get('graphql', [
