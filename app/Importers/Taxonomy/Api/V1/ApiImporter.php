@@ -2,6 +2,7 @@
 
 namespace App\Importers\Taxonomy\Api\V1;
 
+use App\BristindexGrouping;
 use App\Importers\ImporterInterface;
 use App\Region;
 use App\Yrkesbenamning;
@@ -46,6 +47,11 @@ class ApiImporter implements ImporterInterface
      */
     public $yrkesbenamningar;
 
+    /**
+     * @var Collection
+     */
+    public $bristindexGroupings;
+
     public function __construct()
     {
         $this->client = new Client([
@@ -60,6 +66,7 @@ class ApiImporter implements ImporterInterface
     {
         $this->fetchAll();
 
+        $this->insertBristindexGroupings();
         $this->insertRegioner();
         $this->insertYrkesbenamningar();
         $this->insertYrkesomraden();
@@ -83,6 +90,33 @@ class ApiImporter implements ImporterInterface
                 'name' => $yrkesomrade->{'taxonomy/preferred-label'},
                 'description' => $yrkesomrade->{'taxonomy/definition'},
             ]);
+        });
+
+        return $this;
+    }
+
+    /**
+     * return $this
+     */
+    public function insertBristindexGroupings()
+    {
+        $this->bristindexGroupings->each(function ($bristindexGrouping) {
+            $created = BristindexGrouping::updateOrCreate(['external_id' => $bristindexGrouping->{'id'}], [
+                'external_id' => $bristindexGrouping->{'id'},
+                'name' => $bristindexGrouping->{'preferred_label'},
+                'description' => $bristindexGrouping->{'definition'},
+            ]);
+
+            $yrkesgrupper = [];
+
+            foreach ($bristindexGrouping->related as $related) {
+                $yrkesgrupp = Yrkesgrupp::where('external_id', $related->id)->first();
+                if ($yrkesgrupp) {
+                    $yrkesgrupper[] = $yrkesgrupp->id;
+                }
+            }
+
+            $created->yrkesgrupper()->sync($yrkesgrupper);
         });
 
         return $this;
@@ -181,6 +215,7 @@ class ApiImporter implements ImporterInterface
      */
     public function fetchAll()
     {
+        $this->bristindexGroupings = $this->fetchBristindexGroupings();
         $this->yrkesomraden = $this->fetchYrkesomraden();
         $this->yrkesgrupper = $this->fetchYrkesgrupper();
         $this->yrkesbenamningar = $this->fetchYrkesbenamningar();
@@ -190,8 +225,38 @@ class ApiImporter implements ImporterInterface
         $this->yrkesomradenYrkesgrupperMapping = $this->fetchYrkesgrupperYrkesomradenMapping();
         $this->yrkesgrupperYrkesbenamningarMapping = $this->fetchYrkesgrupperYrkesbenamningarMapping();
 
-
         return $this;
+    }
+
+
+    public function fetchBristindexGroupings()
+    {
+        $graphql = [
+            'query' => <<<GRAPHAQL
+                query MyQuery {
+                  concepts(type: "forecast-occupation") {
+                    id
+                    preferred_label
+                    type
+                    definition
+                    related {
+                      id
+                      preferred_label
+                      type
+                      ssyk_code_2012
+                    }
+                  }
+                }
+                GRAPHAQL
+        ];
+
+        $res = $this->client->get('graphql', [
+            'query' => $graphql
+        ]);
+
+        $collection = collect(json_decode($res->getBody()));
+
+        return collect(data_get($collection, 'data.concepts'));
     }
 
     /**

@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class BristindexYrkesgrupp extends Model
+class Bristindex extends Model
 {
-    protected $table = 'bristindex_yrkesgrupp';
+    protected $table = 'bristindex';
 
     protected $guarded = [];
 
@@ -81,8 +81,8 @@ class BristindexYrkesgrupp extends Model
         return $query->where('artal', function($where) {
             $where
                 ->select(DB::raw("max(artal)"))
-                ->fromRaw("bristindex_yrkesgrupp as j")
-                ->whereRaw("j.omfang = bristindex_yrkesgrupp.omfang");
+                ->fromRaw("bristindex as j")
+                ->whereRaw("j.omfang = bristindex.omfang");
         });
     }
 }

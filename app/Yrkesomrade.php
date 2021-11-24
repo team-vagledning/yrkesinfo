@@ -69,14 +69,14 @@ class Yrkesomrade extends Model
             $query->where('region_id', $regionId);
         })->get();
 
-        $commonFemAr = BristindexYrkesgrupp::mostCommonBristindex($femAr);
-        $commonEttAr = BristindexYrkesgrupp::mostCommonBristindex($ettAr);
+        $commonFemAr = Bristindex::mostCommonBristindex($femAr);
+        $commonEttAr = Bristindex::mostCommonBristindex($ettAr);
 
-        $femArValue = BristindexYrkesgrupp::$ranges[$commonFemAr['text']][0];
-        $femArValueInverted = BristindexYrkesgrupp::$ranges[$commonFemAr['text']][2];
+        $femArValue = Bristindex::$ranges[$commonFemAr['text']][0];
+        $femArValueInverted = Bristindex::$ranges[$commonFemAr['text']][2];
 
-        $ettArValue = BristindexYrkesgrupp::$ranges[$commonEttAr['text']][0];
-        $ettArValueInverted = BristindexYrkesgrupp::$ranges[$commonEttAr['text']][2];
+        $ettArValue = Bristindex::$ranges[$commonEttAr['text']][0];
+        $ettArValueInverted = Bristindex::$ranges[$commonEttAr['text']][2];
 
         $femArTextToLower = strtolower($commonFemAr['text']);
         $ettArTextToLower = strtolower($commonEttAr['text']);

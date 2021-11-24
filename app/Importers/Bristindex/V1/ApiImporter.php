@@ -2,7 +2,7 @@
 
 namespace App\Importers\Bristindex\V1;
 
-use App\BristindexYrkesgrupp;
+use App\Bristindex;
 use App\Importers\ImporterInterface;
 use App\Region;
 use App\Yrkesgrupp;
@@ -25,7 +25,7 @@ class ApiImporter implements ImporterInterface
     public function run()
     {
         // Fresh import
-        BristindexYrkesgrupp::truncate();
+        Bristindex::truncate();
 
         foreach (Yrkesgrupp::get() as $yrkesgrupp) {
             $res = $this->client->get($yrkesgrupp->ssyk);
@@ -52,7 +52,7 @@ class ApiImporter implements ImporterInterface
 
                 }
 
-                BristindexYrkesgrupp::insert($toInsert);
+                Bristindex::insert($toInsert);
 
                 print "Inserting bristindex for: " . $yrkesgrupp->ssyk . "\n";
             } else {

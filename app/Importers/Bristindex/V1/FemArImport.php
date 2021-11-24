@@ -2,7 +2,7 @@
 
 namespace App\Importers\Bristindex\V1;
 
-use App\BristindexYrkesgrupp;
+use App\Bristindex;
 use App\Yrkesgrupp;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -24,7 +24,7 @@ class FemArImport implements ToCollection
             }
 
             foreach ($yrkesgrupper as $yrkesgrupp) {
-                BristindexYrkesgrupp::updateOrCreate([
+                Bristindex::updateOrCreate([
                     'region_id' => null,
                     'yrkesgrupp_id' => $yrkesgrupp->id,
                     'omfang' => self::OMFANG,

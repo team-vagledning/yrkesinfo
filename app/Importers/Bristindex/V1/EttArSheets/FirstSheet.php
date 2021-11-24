@@ -2,7 +2,7 @@
 
 namespace App\Importers\Bristindex\V1\EttArSheets;
 
-use App\BristindexYrkesgrupp;
+use App\Bristindex;
 use App\Region;
 use App\Yrkesgrupp;
 use Illuminate\Support\Collection;
@@ -36,7 +36,7 @@ class FirstSheet implements ToCollection, WithStartRow
             }
 
             foreach ($yrkesgrupper as $yrkesgrupp) {
-                BristindexYrkesgrupp::updateOrCreate([
+                Bristindex::updateOrCreate([
                     'region_id' => $region->id,
                     'yrkesgrupp_id' => $yrkesgrupp->id,
                     'omfang' => self::OMFANG,
