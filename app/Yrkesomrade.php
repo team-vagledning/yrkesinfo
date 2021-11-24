@@ -37,6 +37,11 @@ class Yrkesomrade extends Model
         return $this->hasManyDeepFromRelations($this->yrkesgrupper(), (new Yrkesgrupp)->bristindex());
     }
 
+    public function bristindexGroupings()
+    {
+        return $this->hasManyDeepFromRelations($this->yrkesgrupper(), (new Yrkesgrupp)->bristindexGroupings());
+    }
+
     public function texts()
     {
         return $this->morphMany(Text::class, 'ref');
@@ -114,8 +119,16 @@ class Yrkesomrade extends Model
 
         $res = [];
 
-        $ettAr = $this->bristindex()->ettAr()->maxArtal()->get();
-        $femAr = $this->bristindex()->femAr()->maxArtal()->get();
+        /**
+         * Fetch all groupings, and only get one yrkesgrupp out of each
+         */
+        $groupings = $this->bristindexGroupings()->distinct()->with('yrkesgrupper')->get();
+        $yrkesgrupper = $groupings->map(function ($grouping) {
+            return $grouping->yrkesgrupper()->has('bristindex')->first();
+        })->pluck('id');
+
+        $ettAr = $this->bristindex()->ettAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
+        $femAr = $this->bristindex()->femAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
 
         if (count($ettAr)) {
             $res[] = [
