@@ -24,7 +24,9 @@ class YrkesprognoserController extends Controller
             abort(404);
         }
 
-        return BristindexGroupingResource::collection($yrkesomrade->bristindexGroupings()->distinct()->get());
+        return BristindexGroupingResource::collection(
+            $yrkesomrade->bristindexGroupings()->distinct()->with('yrkesgrupper')->get()
+        );
     }
 
     public function show($id)
