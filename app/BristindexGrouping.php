@@ -19,7 +19,7 @@ class BristindexGrouping extends Model
         return $this->belongsToMany(Yrkesgrupp::class, 'bristindex_groupings_has_yrkesgrupper');
     }
 
-    public static function getByNameSimilarity($term, $similarity = 0.3)
+    public static function getByNameSimilarity($term, $similarity = 0.3, $with = [])
     {
         $ids = collect(DB::select(DB::raw("
             select id, similarity(name_expl, :term) as similarity
@@ -35,7 +35,7 @@ class BristindexGrouping extends Model
         ]));
 
         // Inject similarity into the results, could possible be made with a sql query
-        $bristindexGroupings = self::whereIn('id', $ids->pluck('id'))->get()->each(function ($bristindexGrouping) use ($ids) {
+        $bristindexGroupings = self::whereIn('id', $ids->pluck('id'))->with($with)->get()->each(function ($bristindexGrouping) use ($ids) {
             $bristindexGrouping->similarity = (float) $ids->keyBy('id')[$bristindexGrouping->id]->similarity;
         });
 

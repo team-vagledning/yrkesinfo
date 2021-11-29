@@ -55,7 +55,7 @@ class YrkesprognoserController extends Controller
         }
 
         // Check for keyword search
-        $bristindexGrouping = BristindexGrouping::getByNameSimilarity($term);
+        $bristindexGrouping = BristindexGrouping::getByNameSimilarity($term, 0.3, ['yrkesgrupper']);
 
         $resourceCollection = BristindexGroupingResource::collection($bristindexGrouping);
 
