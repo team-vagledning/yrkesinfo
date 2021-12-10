@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BristindexGroupingCollection;
 use App\Http\Resources\Yrkesgrupp as YrkesgruppResource;
 use App\KeywordedYrkesgruppSearch;
+use App\Services\BristindexGroupingService;
 use App\Services\YrkesgruppService;
 use App\Yrkesomrade;
 use App\Http\Resources\BristindexGrouping as BristindexGroupingResource;
@@ -55,7 +56,7 @@ class YrkesprognoserController extends Controller
         }
 
         // Check for keyword search
-        $bristindexGrouping = BristindexGrouping::getByNameSimilarity($term, 0.3, ['yrkesgrupper']);
+        $bristindexGrouping = app(BristindexGroupingService::class)->searchBySimilarity($term);
 
         $resourceCollection = BristindexGroupingResource::collection($bristindexGrouping);
 

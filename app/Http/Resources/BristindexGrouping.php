@@ -18,6 +18,7 @@ class BristindexGrouping extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'search_similarity' => $this->when(isset($this->similarity), $this->similarity),
             'yrkesprognoser' => Yrkesprognos::collection(
                 $this->yrkesgrupper()->has('bristindex')->first()->getYrkesprognoser()
             ),
