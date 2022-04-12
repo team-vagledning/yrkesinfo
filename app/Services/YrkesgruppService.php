@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\BristindexGrouping;
 use App\Yrkesbenamning;
 use App\Yrkesgrupp;
 

@@ -23,6 +23,10 @@ Route::namespace('Api\V1')->prefix('v1')->group(function () {
     Route::get('yrkesomraden/{id}', 'YrkesomradenController@show');
 
     Route::get('yrkesomraden/{id}/yrkesgrupper/{ssyk}', 'YrkesgrupperController@showFromYrkesomrade');
+    Route::get('yrkesomraden/{id}/yrkesprognoser', 'YrkesprognoserController@showFromYrkesomrade');
+
+    Route::get('yrkesprognoser/search', 'YrkesprognoserController@search');
+    Route::get('yrkesprognoser/{id}', 'YrkesprognoserController@show');
 
     Route::get('yrkesgrupper', 'YrkesgrupperController@index');
     Route::get('yrkesgrupper/search', 'YrkesgrupperController@search');

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\BristindexYrkesgrupp;
+use App\Bristindex;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\YrkesomradeCollection;
 use App\Yrkesgrupp;

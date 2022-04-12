@@ -42,7 +42,12 @@ class Yrkesgrupp extends Model
 
     public function bristindex()
     {
-        return $this->hasMany(BristindexYrkesgrupp::class, 'yrkesgrupp_id');
+        return $this->hasMany(Bristindex::class, 'yrkesgrupp_id');
+    }
+
+    public function bristindexGroupings()
+    {
+        return $this->belongsToMany(BristindexGrouping::class, 'bristindex_groupings_has_yrkesgrupper');
     }
 
     public function sunkoder()

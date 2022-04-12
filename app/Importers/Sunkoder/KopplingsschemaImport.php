@@ -2,7 +2,7 @@
 
 namespace App\Importers\Sunkoder;
 
-use App\BristindexYrkesgrupp;
+use App\Bristindex;
 use App\Sunkod;
 use App\Yrkesgrupp;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

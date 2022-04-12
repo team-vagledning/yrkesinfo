@@ -13,7 +13,7 @@ class SetArtalForOldBristindex extends Migration
      */
     public function up()
     {
-        $bristindex = \App\BristindexYrkesgrupp::get();
+        $bristindex = \App\Bristindex::get();
 
         foreach ($bristindex as $b) {
             $b->artal = ($b->omfang == 1) ? '2019' : '2023';
@@ -29,7 +29,7 @@ class SetArtalForOldBristindex extends Migration
      */
     public function down()
     {
-        $bristindex = \App\BristindexYrkesgrupp::get();
+        $bristindex = \App\Bristindex::get();
 
         foreach ($bristindex as $b) {
             $b->artal = null;

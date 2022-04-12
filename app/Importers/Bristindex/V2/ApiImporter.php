@@ -2,7 +2,7 @@
 
 namespace App\Importers\Bristindex\V2;
 
-use App\BristindexYrkesgrupp;
+use App\Bristindex;
 use App\Importers\ImporterInterface;
 use App\Region;
 use App\Yrkesgrupp;
@@ -70,7 +70,7 @@ class ApiImporter implements ImporterInterface
 
             $omfang = $row->ar - date('Y');
 
-            BristindexYrkesgrupp::updateOrCreate(
+            Bristindex::updateOrCreate(
                 [
                     'yrkesgrupp_id' => $yrkesgrupp->id,
                     'region_id' => $region_id,
