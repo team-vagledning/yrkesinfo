@@ -26,7 +26,7 @@ class MakeSunkodUnique extends Migration
     public function down()
     {
         Schema::table('sunkoder', function (Blueprint $table) {
-            $table->dropUnique('sunkod');
+            $table->dropUnique(['kod']);
         });
     }
 }

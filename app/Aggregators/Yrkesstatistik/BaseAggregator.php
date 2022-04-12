@@ -33,8 +33,10 @@ abstract class BaseAggregator
         $this->weighted[$keyName]['value'] += $value * $count;
 
         try {
-            $this->weighted[$keyName]['weighted_value'] =
-                $this->weighted[$keyName]['value'] / $this->weighted[$keyName]['count'];
+            if ($count > 0) {
+                $this->weighted[$keyName]['weighted_value'] =
+                    $this->weighted[$keyName]['value'] / $this->weighted[$keyName]['count'];
+            }
         } catch (\ErrorException $e) {
             // Should we do something?
         }

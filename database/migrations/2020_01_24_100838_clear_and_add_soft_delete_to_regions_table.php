@@ -19,6 +19,13 @@ class ClearAndAddSoftDeleteToRegionsTable extends Migration
         Schema::table('regioner', function (Blueprint $table) {
             $table->softDeletes();
         });
+
+        $this->data()->each(function ($name, $externalId) {
+            \App\Region::create([
+                'external_id' => $externalId,
+                'name' => $name
+            ]);
+        });
     }
 
     /**
