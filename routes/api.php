@@ -34,4 +34,5 @@ Route::namespace('Api\V1')->prefix('v1')->group(function () {
     Route::get('yrkesgrupper/{ssyk}', 'YrkesgrupperController@show');
 
     Route::get('regioner', 'RegionerController@index');
+    Route::get('fa-regioner', 'FaRegionerController@index');
 });

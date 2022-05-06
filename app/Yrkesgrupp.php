@@ -103,8 +103,7 @@ class Yrkesgrupp extends Model
 
         $ettAr = $this->bristindex()->ettAr()->maxArtal()->first();
         $femAr = $this->bristindex()->femAr()->maxArtal()->first();
-
-        dd($ettAr, $femAr);
+        
 
         if ($ettAr) {
             array_push($res, $ettAr);
