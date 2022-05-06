@@ -18,24 +18,29 @@ class AggregatorTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-    }
 
-    public function testAggregation()
-    {
         // Prepare DB
         DB::statement(file_get_contents(base_path('tests/database/yrkesgrupper.sql')));
         DB::statement(file_get_contents(base_path('tests/database/yrkesstatistik.sql')));
 
-        // Load JSON from master file
-        $statistics = json_decode(file_get_contents(base_path('tests/database/yrkesstatistik_aggregated.json')), true);
-
         // Aggregate data
         \Artisan::call(AggregateStatistics::class);
+    }
+
+    public function testAggregation()
+    {
+        // Load JSON from master file
+        $statistics = json_decode(file_get_contents(base_path('tests/database/yrkesstatistik_aggregated.json')), true);
 
         // Compare with master
         foreach (YrkesstatistikAggregated::all() as $count => $agg) {
             //dd($statistics[$count]['statistics']['entries'][0], $agg->statistics['entries'][0]);
             $this->assertEqualsCanonicalizing($statistics[$count]['statistics'], $agg->statistics);
         }
+    }
+
+    public function testYrkesgrupperAggregation()
+    {
+
     }
 }
