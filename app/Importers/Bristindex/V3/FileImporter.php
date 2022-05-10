@@ -83,14 +83,14 @@ class FileImporter implements ToCollection, WithStartRow, WithCustomCsvSettings
                 'pension' => $row[self::PENSION],
                 'efterfraga' => $row[self::EFTERFRAGA],
 
-                'pil_2022_tilltrade' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_TILLTRADE])),
-                'pil_2026_tilltrade' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_TILLTRADE])),
+                'pil_2022_tilltrade' => floatval(round_number(str_replace(',', '.', $row[self::PIL_2022_TILLTRADE]))),
+                'pil_2026_tilltrade' => floatval(round_number(str_replace(',', '.', $row[self::PIL_2026_TILLTRADE]))),
 
-                'pil_2022_pension' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_PENSION])),
-                'pil_2026_pension' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_PENSION])),
+                'pil_2022_pension' => floatval(round_number(str_replace(',', '.', $row[self::PIL_2022_PENSION]))),
+                'pil_2026_pension' => floatval(round_number(str_replace(',', '.', $row[self::PIL_2026_PENSION]))),
 
-                'pil_2022_efterfraga' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_EFTERFRAGA])),
-                'pil_2026_efterfraga' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_EFTERFRAGA])),
+                'pil_2022_efterfraga' => floatval(round_number(str_replace(',', '.', $row[self::PIL_2022_EFTERFRAGA]))),
+                'pil_2026_efterfraga' => floatval(round_number(str_replace(',', '.', $row[self::PIL_2026_EFTERFRAGA]))),
 
                 'index' => $row[self::INDEX],
                 'svarare_fa_region_id' => $svarareFaRegion ? $svarareFaRegion->id : null,
