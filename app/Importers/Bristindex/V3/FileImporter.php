@@ -126,17 +126,15 @@ class FileImporter implements ToCollection, WithStartRow, WithCustomCsvSettings
                 $oneYear = self::makeYear(
                     $bristindexInsert,
                     1,
-                    '2023',
-                    $oneYearBristindex,
-                    $meta
+                    '2022',
+                    $oneYearBristindex
                 );
 
                 $fiveYear = self::makeYear(
                     $bristindexInsert,
                     5,
                     '2026',
-                    $fiveYearBristindex,
-                    $meta
+                    $fiveYearBristindex
                 );
 
                 Bristindex::insert([$oneYear, $fiveYear]);
