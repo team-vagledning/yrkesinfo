@@ -60,32 +60,44 @@ class FileImporter implements ToCollection, WithStartRow, WithCustomCsvSettings
             $grouping = BristindexGrouping::where('external_id', '=', (string) $row[self::CONCEPT_ID])
                 ->with('yrkesgrupper')->first();
 
+            $oneYearBristindex = $row[self::BRISTINDEX_1_YEAR];
+            $fiveYearBristindex = $row[self::BRISTINDEX_5_YEAR];
+
+            $svarareFaRegion = null;
+            if (is_numeric($row[self::SVARARE])) {
+                $svarareFaRegion = FaRegion::where('external_id', $row[self::SVARARE])->first();
+            }
+
+            $lattareFaRegion = null;
+            if (is_numeric($row[self::SVARARE])) {
+                $lattareFaRegion = FaRegion::where('external_id', $row[self::LATTARE])->first();
+            }
+
+
+            $meta = [
+                'yrkesverksamma' => $row[self::NUM_YRKESVERKSAMMA],
+                'andel_kvinnor' => $row[self::NUM_KVINNOR],
+                'andel_man' => $row[self::NUM_MAN],
+                'special' => $row[self::SPECIAL],
+                'tilltrade' => $row[self::TILLTRADE],
+                'pension' => $row[self::PENSION],
+                'efterfraga' => $row[self::EFTERFRAGA],
+
+                'pil_2022_tilltrade' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_TILLTRADE])),
+                'pil_2026_tilltrade' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_TILLTRADE])),
+
+                'pil_2022_pension' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_PENSION])),
+                'pil_2026_pension' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_PENSION])),
+
+                'pil_2022_efterfraga' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_EFTERFRAGA])),
+                'pil_2026_efterfraga' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_EFTERFRAGA])),
+
+                'index' => $row[self::INDEX],
+                'svarare_fa_region_id' => $svarareFaRegion ? $svarareFaRegion->id : null,
+                'lattare_fa_region_id' => $lattareFaRegion ? $lattareFaRegion->id : null,
+            ];
+
             foreach ($grouping->yrkesgrupper as $yrkesgrupp) {
-                $oneYearBristindex = $row[self::BRISTINDEX_1_YEAR];
-                $fiveYearBristindex = $row[self::BRISTINDEX_5_YEAR];
-                $meta = [
-                    'yrkesverksamma' => $row[self::NUM_YRKESVERKSAMMA],
-                    'andel_kvinnor' => $row[self::NUM_KVINNOR],
-                    'andel_man' => $row[self::NUM_MAN],
-                    'special' => $row[self::SPECIAL],
-                    'tilltrade' => $row[self::TILLTRADE],
-                    'pension' => $row[self::PENSION],
-                    'efterfraga' => $row[self::EFTERFRAGA],
-
-                    'pil_2022_tilltrade' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_TILLTRADE])),
-                    'pil_2026_tilltrade' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_TILLTRADE])),
-
-                    'pil_2022_pension' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_PENSION])),
-                    'pil_2026_pension' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_PENSION])),
-
-                    'pil_2022_efterfraga' => (float) round_number(str_replace(',', '.', $row[self::PIL_2022_EFTERFRAGA])),
-                    'pil_2026_efterfraga' => (float) round_number(str_replace(',', '.', $row[self::PIL_2026_EFTERFRAGA])),
-
-                    'index' => $row[self::INDEX],
-                    'svarare' => $row[self::SVARARE],
-                    'lattare' => $row[self::LATTARE],
-                ];
-
                 // Copy from 0 fa region
                 if ($faRegion !== null) {
                     $parentOneYear = $yrkesgrupp->bristindex()->riket()->ettAr()->first();

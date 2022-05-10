@@ -31,7 +31,7 @@ class BristindexGrouping extends JsonResource
             'yrkesprognoser' => Yrkesprognos::collection(
                 $yrkesprognoser
             ),
-            'yrkesprognoser_per_region' => YrkesprognosFaRegion::collection($yrkesprognoserPerRegion),
+            'yrkesprognoser_per_fa_region' => YrkesprognosFaRegion::collection($yrkesprognoserPerRegion),
             'yrkesgrupper' => YrkesgruppResource::collection($this->whenLoaded('yrkesgrupper')),
         ];
     }
