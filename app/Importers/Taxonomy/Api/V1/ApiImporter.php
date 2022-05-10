@@ -57,7 +57,8 @@ class ApiImporter implements ImporterInterface
         $this->client = new Client([
             'base_uri' => self::API_URL,
             'headers' => [
-                'api-key' => env('JOBTECH_API_KEY')
+                'api-key' => env('JOBTECH_API_KEY'),
+                'accept-encoding' => 'gzip, deflate',
             ]
         ]);
     }

@@ -67,8 +67,8 @@ class ApiImporter implements ImporterInterface
                 continue;
             }
 
-
             $omfang = $row->ar - date('Y');
+            $omfang = $omfang <= 1 ? 1 : 5;
 
             Bristindex::updateOrCreate(
                 [

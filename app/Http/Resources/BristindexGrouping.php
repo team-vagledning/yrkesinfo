@@ -15,12 +15,19 @@ class BristindexGrouping extends JsonResource
      */
     public function toArray($request)
     {
+        $yrkesgruppWithPotentialBristindex = $this->yrkesgrupper()->has('bristindex')->first();
+        $yrkesprognoser = [];
+
+        if ($yrkesgruppWithPotentialBristindex) {
+            $yrkesprognoser = $yrkesgruppWithPotentialBristindex->getYrkesprognoser();
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'search_similarity' => $this->when(isset($this->similarity), $this->similarity),
             'yrkesprognoser' => Yrkesprognos::collection(
-                $this->yrkesgrupper()->has('bristindex')->first()->getYrkesprognoser()
+                $yrkesprognoser
             ),
             'yrkesgrupper' => YrkesgruppResource::collection($this->whenLoaded('yrkesgrupper')),
         ];
