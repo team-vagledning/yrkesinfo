@@ -101,9 +101,9 @@ class Yrkesgrupp extends Model
     {
         $res = [];
 
-        $ettAr = $this->bristindex()->ettAr()->maxArtal()->first();
-        $femAr = $this->bristindex()->femAr()->maxArtal()->first();
-        
+        $ettAr = $this->bristindex()->riket()->ettAr()->maxArtal()->first();
+        $femAr = $this->bristindex()->riket()->femAr()->maxArtal()->first();
+
 
         if ($ettAr) {
             array_push($res, $ettAr);
@@ -115,5 +115,12 @@ class Yrkesgrupp extends Model
 
 
         return collect($res);
+    }
+
+    public function getYrkesprognoserWithFaRegioner()
+    {
+        $res = [];
+
+        return $this->bristindex()->distinct('fa_region_id')->whereNotNull('fa_region_id')->get();
     }
 }

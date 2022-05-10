@@ -17,9 +17,11 @@ class BristindexGrouping extends JsonResource
     {
         $yrkesgruppWithPotentialBristindex = $this->yrkesgrupper()->has('bristindex')->first();
         $yrkesprognoser = [];
+        $yrkesprognoserPerRegion = [];
 
         if ($yrkesgruppWithPotentialBristindex) {
             $yrkesprognoser = $yrkesgruppWithPotentialBristindex->getYrkesprognoser();
+            $yrkesprognoserPerRegion = $yrkesgruppWithPotentialBristindex->getYrkesprognoserWithFaRegioner();
         }
 
         return [
@@ -29,6 +31,7 @@ class BristindexGrouping extends JsonResource
             'yrkesprognoser' => Yrkesprognos::collection(
                 $yrkesprognoser
             ),
+            'yrkesprognoser_per_region' => YrkesprognosFaRegion::collection($yrkesprognoserPerRegion),
             'yrkesgrupper' => YrkesgruppResource::collection($this->whenLoaded('yrkesgrupper')),
         ];
     }

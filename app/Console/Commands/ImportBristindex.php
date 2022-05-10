@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Importers\Bristindex\V2\ApiImporter;
+use App\Importers\Bristindex\V3\FileImporter;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ImportBristindex extends Command
 {
@@ -39,6 +41,11 @@ class ImportBristindex extends Command
      */
     public function handle()
     {
-        app(ApiImporter::class)->run();
+        Excel::import(
+            new FileImporter,
+            storage_path('imports/bristindex/v3/bedomning.csv'),
+            null,
+            \Maatwebsite\Excel\Excel::CSV
+        );
     }
 }

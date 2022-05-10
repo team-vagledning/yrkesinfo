@@ -61,6 +61,11 @@ class Bristindex extends Model
         return $this->belongsTo(Region::class, 'region_id');
     }
 
+    public function faRegion()
+    {
+        return $this->belongsTo(FaRegion::class, 'fa_region_id');
+    }
+
     public function yrkesgrupp()
     {
         return $this->belongsTo(Yrkesgrupp::class, 'yrkesgrupp_id');
@@ -74,6 +79,11 @@ class Bristindex extends Model
     public function scopeEttAr($query)
     {
         return $query->where('omfang', 1);
+    }
+
+    public function scopeRiket($query)
+    {
+        return $query->where('fa_region_id', null);
     }
 
     public function scopeMaxArtal($query)

@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class Yrkesprognos extends JsonResource
+class YrkesprognosFaRegion extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,8 +15,6 @@ class Yrkesprognos extends JsonResource
     public function toArray($request)
     {
         return array_merge([
-            'omfang' => (int) $this->omfang,
-            'artal' => $this->artal,
             'varde' => (float) $this->bristindex,
             'fa_region_id' => $this->faRegion ? $this->faRegion->id : null,
         ], $this->meta);
