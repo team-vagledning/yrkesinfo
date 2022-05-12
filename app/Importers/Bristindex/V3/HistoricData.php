@@ -65,7 +65,7 @@ class HistoricData implements ToCollection, WithStartRow, WithCustomCsvSettings
                     'yrkesgrupp_id' => $yrkesgrupp->id,
                     'artal' => $row[self::ARTAL],
                 ], [
-                    'data' => json_encode($data)
+                    'data' => $data
                 ]);
             }
         }
