@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Importers\Bristindex\V2\ApiImporter;
-use App\Importers\Bristindex\V3\FileImporter;
+use App\Importers\Bristindex\V3\CurrentData;
+use App\Importers\Bristindex\V3\HistoricData;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -41,11 +42,21 @@ class ImportBristindex extends Command
      */
     public function handle()
     {
+        // Actual
         Excel::import(
-            new FileImporter,
+            new CurrentData,
             storage_path('imports/bristindex/v3/bedomning.csv'),
             null,
             \Maatwebsite\Excel\Excel::CSV
         );
+
+        // Historical
+        Excel::import(
+            new HistoricData,
+            storage_path('imports/bristindex/v3/historik.csv'),
+            null,
+            \Maatwebsite\Excel\Excel::CSV
+        );
     }
+
 }

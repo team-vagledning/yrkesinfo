@@ -12,7 +12,7 @@ class FileImporter implements ImporterInterface
     {
         FaRegion::truncate();
 
-        $xmlData = simplexml_load_file(storage_path('imports/fa_regioner/fa_regioner_tillvaxtverket.kml'));
+        $xmlData = simplexml_load_file(storage_path('imports/fa_regioner/fa-regioner-qgis.kml'));
 
         $regioner = [];
 

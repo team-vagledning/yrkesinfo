@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class FileImporter implements ToCollection, WithStartRow, WithCustomCsvSettings
+class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
 {
     public const CONCEPT_ID = 0;
     public const FA_REGION = 1;

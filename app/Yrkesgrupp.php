@@ -50,6 +50,11 @@ class Yrkesgrupp extends Model
         return $this->belongsToMany(BristindexGrouping::class, 'bristindex_groupings_has_yrkesgrupper');
     }
 
+    public function bristindexHistorical()
+    {
+        return $this->hasMany(BristindexHistorical::class, 'yrkesgrupp_id');
+    }
+
     public function sunkoder()
     {
         return $this->belongsToMany(Sunkod::class, 'yrkesgrupper_has_sunkoder');
@@ -119,8 +124,11 @@ class Yrkesgrupp extends Model
 
     public function getYrkesprognoserWithFaRegioner()
     {
-        $res = [];
-
         return $this->bristindex()->distinct('fa_region_id')->whereNotNull('fa_region_id')->get();
+    }
+
+    public function getYrkesprognoserHistorical()
+    {
+        return $this->bristindexHistorical()->get();
     }
 }
