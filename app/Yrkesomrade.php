@@ -69,8 +69,16 @@ class Yrkesomrade extends Model
 
         $res = [];
 
-        $femAr = $this->bristindex()->femAr()->maxArtal()->get();
-        $ettAr = $this->bristindex()->ettAr()->maxArtal()->when($regionId, function ($query, $regionId) {
+        /**
+         * Fetch all groupings, and only get one yrkesgrupp out of each
+         */
+        $groupings = $this->bristindexGroupings()->distinct()->with('yrkesgrupper')->get();
+        $yrkesgrupper = $groupings->map(function ($grouping) {
+            return $grouping->yrkesgrupper()->has('bristindex')->first();
+        })->pluck('id');
+
+        $femAr = $this->bristindex()->riket()->femAr()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->maxArtal()->get();
+        $ettAr = $this->bristindex()->riket()->ettAr()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->maxArtal()->when($regionId, function ($query, $regionId) {
             $query->where('region_id', $regionId);
         })->get();
 

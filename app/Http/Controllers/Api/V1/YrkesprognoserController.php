@@ -17,17 +17,26 @@ use Illuminate\Support\Str;
 
 class YrkesprognoserController extends Controller
 {
-    public function showFromYrkesomrade($yrkesomradeId)
+    public function showFromYrkesomrade($yrkesomradeId, Request $request)
     {
+        $cacheKey = "yrkesprognoser.yrkesomraden" . $yrkesomradeId;
+        if (Cache::has($cacheKey) && ! $request->has('clearCache')) {
+            return Cache::get($cacheKey);
+        }
+
         $yrkesomrade = Yrkesomrade::where('id', $yrkesomradeId)->with('bristindexGroupings')->first();
 
         if (!$yrkesomrade) {
             abort(404);
         }
 
-        return BristindexGroupingResource::collection(
+        $resource = BristindexGroupingResource::collection(
             $yrkesomrade->bristindexGroupings()->distinct()->with('yrkesgrupper')->get()
         );
+
+        Cache::put($cacheKey, $resource, now()->addDays(30));
+
+        return $resource;
     }
 
     public function show($id)

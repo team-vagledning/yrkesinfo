@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Importers\Taxonomy\Api\V1\ApiImporter;
+use App\Region;
 use const App\Console\EXIT_FAILURE;
 use const App\Console\EXIT_OK;
 use App\Importers\Taxonomy\AlternativeSsykImporter;
@@ -51,6 +52,15 @@ class ImportTaxonomy extends Command
             }
 
             app(AlternativeSsykImporter::class)->run();
+
+            // Also import koordinater
+            $regioner = json_decode(file_get_contents(storage_path('imports/regioner/regioner.json')));
+
+            foreach ($regioner as $r) {
+                $region = Region::where('name', $r->lansnamn)->firstOrFail();
+                $region->grans = $r->grans;
+                $region->save();
+            }
 
         } catch (\Exception $e) {
             echo $e->getMessage();
