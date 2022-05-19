@@ -135,8 +135,8 @@ class Yrkesomrade extends Model
             return $grouping->yrkesgrupper()->has('bristindex')->first();
         })->pluck('id');
 
-        $ettAr = Bristindex::riket()->ettAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
-        $femAr = Bristindex::riket()->femAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
+        $ettAr = $this->bristindex()->riket()->ettAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
+        $femAr = $this->bristindex()->riket()->femAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
 
         if (count($ettAr)) {
             $res[] = [
