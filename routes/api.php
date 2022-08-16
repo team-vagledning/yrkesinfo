@@ -38,4 +38,6 @@ Route::namespace('Api\V1')->prefix('v1')->group(function () {
 
     Route::get('regioner', 'RegionerController@index');
     Route::get('fa-regioner', 'FaRegionerController@index');
+    Route::get('kommuner', 'KommunerController@index');
+    Route::get('kommuner/kommunkod/{kommunkod}', 'KommunerController@showFromKommunkod');
 });
