@@ -19,7 +19,7 @@ class Yrkesbenamning extends Model
         return $this->belongsToMany(Yrkesgrupp::class, 'yrkesgrupper_has_yrkesbenamningar');
     }
 
-    public static function getByNameSimilarity($term, $similarity = 0.3)
+    public static function getByNameSimilarity($term, $similarity = 0.3, $with = [])
     {
         $ids = collect(DB::select(DB::raw("
             select id, similarity(name_expl, :term) as similarity
@@ -35,8 +35,8 @@ class Yrkesbenamning extends Model
         ]));
 
         // Inject similarity into the results, could possible be made with a sql query
-        $yrkesbenamningar = self::whereIn('id', $ids->pluck('id'))->get()->each(function ($yrkesbenamning) use ($ids) {
-            $yrkesbenamning->similarity = (float) $ids->keyBy('id')[$yrkesbenamning->id]->similarity;
+        $yrkesbenamningar = self::whereIn('id', $ids->pluck('id'))->with($with)->get()->each(function ($yrkesbenamningar) use ($ids) {
+            $yrkesbenamningar->similarity = (float) $ids->keyBy('id')[$yrkesbenamningar->id]->similarity;
         });
 
         return $yrkesbenamningar;

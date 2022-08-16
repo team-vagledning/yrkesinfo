@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Http\Resources\YrkesgruppSimple as YrkesgruppSimpleResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Yrkesbenamning as YrkesbenamningResource;
 
-class Yrkesbenamning extends JsonResource
+class YrkesgruppSimple extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,13 @@ class Yrkesbenamning extends JsonResource
     public function toArray($request)
     {
         return [
+            'id' => $this->id,
+            'yrkesomrade_id' => $this->yrkesomraden()->first()->id,
+            'ssyk' => $this->ssyk,
+            'alternative_ssyk' => $this->alternative_ssyk,
             'name' => $this->name,
-            'external_id' => $this->external_id,
             'search_similarity' => $this->when(isset($this->similarity), $this->similarity),
-            'yrkesgrupper' => YrkesgruppSimpleResource::collection($this->whenLoaded('yrkesgrupper')),
+            'old_yrkesinfo' => $this->when($request->input('withOldYrkesinfo'), $this->extras['old_yrkesinfo'] ?? []),
         ];
     }
 }
