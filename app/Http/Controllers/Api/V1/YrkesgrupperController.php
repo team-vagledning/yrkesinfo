@@ -58,8 +58,8 @@ class YrkesgrupperController extends Controller
             $yrkesgrupp->siblings = $yrkesomrade->yrkesgrupper()->get();
         }
 
-        if ($request->input('withFaRegionYrkesprognoser')) {
-            $yrkesgrupp->yrkesprognoser = $yrkesgrupp->getYrkesprognoserWithFaRegioner();
+        if ($request->input('withAllYrkesprognoser')) {
+            $yrkesgrupp->yrkesprognoser = $yrkesgrupp->getYrkesprognoserWithAll();
         }
 
         return new YrkesgruppResource($yrkesgrupp);

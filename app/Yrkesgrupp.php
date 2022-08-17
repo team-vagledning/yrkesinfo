@@ -127,6 +127,11 @@ class Yrkesgrupp extends Model
         return $this->bristindex()->distinct('fa_region_id')->whereNotNull('fa_region_id')->get();
     }
 
+    public function getYrkesprognoserWithAll()
+    {
+        return $this->bristindex()->get();
+    }
+
     public function getYrkesprognoserHistorical()
     {
         return $this->bristindexHistorical()->get();
