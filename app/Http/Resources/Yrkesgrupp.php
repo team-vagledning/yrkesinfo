@@ -20,6 +20,7 @@ class Yrkesgrupp extends JsonResource
             'yrkesomrade_id' => $this->yrkesomraden()->first()->id,
             'ssyk' => $this->ssyk,
             'yrkesprognoser' => Yrkesprognos::collection($this->yrkesprognoser ?? $this->getYrkesprognoser()),
+            'yrkesprognosgrupp' => BristindexGroupingOnlyNameAndYrkesgrupperCollection::make($this->whenLoaded('bristindexGroupings')),
             'alternative_ssyk' => $this->alternative_ssyk,
             'name' => $this->name,
             'description' => $this->description,

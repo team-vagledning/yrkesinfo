@@ -44,7 +44,13 @@ class YrkesgrupperController extends Controller
 
     public function show($ssyk, Request $request)
     {
-        $yrkesgrupp = Yrkesgrupp::where('ssyk', $ssyk)->with('sunkoder', 'susanavetCourses')->first();
+        $with = ['sunkoder', 'susanavetCourses'];
+
+        if ($request->input('withYrkesprognosgrupper')) {
+            $with[] = 'bristindexGroupings';
+        }
+
+        $yrkesgrupp = Yrkesgrupp::where('ssyk', $ssyk)->with($with)->first();
 
         if (!$yrkesgrupp) {
             abort(404);
