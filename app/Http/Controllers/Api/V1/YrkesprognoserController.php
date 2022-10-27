@@ -21,7 +21,7 @@ class YrkesprognoserController extends Controller
     {
         $cacheKey = "yrkesprognoser.yrkesomraden" . $yrkesomradeId;
         if (Cache::has($cacheKey) && ! $request->has('clearCache')) {
-            return Cache::get($cacheKey);
+            return json_decode(Cache::get($cacheKey));
         }
 
         $yrkesomrade = Yrkesomrade::where('id', $yrkesomradeId)->with('bristindexGroupings')->first();
@@ -34,7 +34,7 @@ class YrkesprognoserController extends Controller
             $yrkesomrade->bristindexGroupings()->distinct()->with('yrkesgrupper')->get()
         );
 
-        Cache::put($cacheKey, $resource, now()->addDays(30));
+        Cache::put($cacheKey, json_encode($resource), now()->addDays(30));
 
         return $resource;
     }
