@@ -107,15 +107,15 @@ class Yrkesgrupp extends Model
         $res = [];
 
         $ettAr = $this->bristindex()->riket()->ettAr()->maxArtal()->first();
-        $femAr = $this->bristindex()->riket()->femAr()->maxArtal()->first();
+        $treAr = $this->bristindex()->riket()->treAr()->maxArtal()->first();
 
 
         if ($ettAr) {
             array_push($res, $ettAr);
         }
 
-        if ($femAr) {
-            array_push($res, $femAr);
+        if ($treAr) {
+            array_push($res, $treAr);
         }
 
 

@@ -77,32 +77,32 @@ class Yrkesomrade extends Model
             return $grouping->yrkesgrupper()->has('bristindex')->first();
         })->pluck('id');
 
-        $femAr = $this->bristindex()->riket()->femAr()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->maxArtal()->get();
+        $treAr = $this->bristindex()->riket()->treAr()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->maxArtal()->get();
         $ettAr = $this->bristindex()->riket()->ettAr()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->maxArtal()->when($regionId, function ($query, $regionId) {
             $query->where('region_id', $regionId);
         })->get();
 
-        $commonFemAr = Bristindex::mostCommonBristindex($femAr);
+        $commonTreAr = Bristindex::mostCommonBristindex($treAr);
         $commonEttAr = Bristindex::mostCommonBristindex($ettAr);
 
-        $femArValue = Bristindex::$ranges[$commonFemAr['text']][0];
-        $femArValueInverted = Bristindex::$ranges[$commonFemAr['text']][2];
+        $treArValue = Bristindex::$ranges[$commonTreAr['text']][0];
+        $treArValueInverted = Bristindex::$ranges[$commonTreAr['text']][2];
 
         $ettArValue = Bristindex::$ranges[$commonEttAr['text']][0];
         $ettArValueInverted = Bristindex::$ranges[$commonEttAr['text']][2];
 
-        $femArTextToLower = strtolower($commonFemAr['text']);
+        $treArTextToLower = strtolower($commonTreAr['text']);
         $ettArTextToLower = strtolower($commonEttAr['text']);
 
-        $forklarandeFemAr = "Utifrån {$femAr->count()} yrkesprognoser så har {$commonFemAr['count']} st {$femArTextToLower}";
+        $forklarandeTreAr = "Utifrån {$treAr->count()} yrkesprognoser så har {$commonTreAr['count']} st {$treArTextToLower}";
         $forklarandeEttAr = "Utifrån {$ettAr->count()} yrkesprognoser så har {$commonEttAr['count']} st {$ettArTextToLower}";
 
         $res = [
             'fem_ar' => [
-                'varde' => $femArValue,
-                'konkurrensVarde' => $femArValueInverted,
-                'text' => $commonFemAr['text'],
-                'forklarandeText' => $forklarandeFemAr,
+                'varde' => $treArValue,
+                'konkurrensVarde' => $treArValueInverted,
+                'text' => $commonTreAr['text'],
+                'forklarandeText' => $forklarandeTreAr,
             ],
             'ett_ar' => [
                 'varde' => $ettArValue,
@@ -136,7 +136,7 @@ class Yrkesomrade extends Model
         })->pluck('id');
 
         $ettAr = $this->bristindex()->riket()->ettAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
-        $femAr = $this->bristindex()->riket()->femAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
+        $treAr = $this->bristindex()->riket()->treAr()->maxArtal()->whereIn('bristindex.yrkesgrupp_id', $yrkesgrupper)->get();
 
         if (count($ettAr)) {
             $res[] = [
@@ -147,12 +147,12 @@ class Yrkesomrade extends Model
             ];
         }
 
-        if (count($femAr)) {
+        if (count($treAr)) {
             $res[] = [
                 'omfang' => 5,
-                'varde' => (float) $femAr->countBy('bristindex')->sort()->keys()->last(),
-                'artal' => $femAr->first()->artal,
-                'antalPrognoser' => $femAr->count(),
+                'varde' => (float) $treAr->countBy('bristindex')->sort()->keys()->last(),
+                'artal' => $treAr->first()->artal,
+                'antalPrognoser' => $treAr->count(),
             ];
         }
 
