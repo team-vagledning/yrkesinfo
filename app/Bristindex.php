@@ -74,6 +74,11 @@ class Bristindex extends Model
         return $query->where('omfang', 5);
     }
 
+    public function scopeTreAr($query)
+    {
+        return $query->where('omfang', 3);
+    }
+
     public function scopeEttAr($query)
     {
         return $query->where('omfang', 1);

@@ -61,7 +61,7 @@ class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
                 ->with('yrkesgrupper')->first();
 
             $oneYearBristindex = $row[self::BRISTINDEX_1_YEAR];
-            $fiveYearBristindex = $row[self::BRISTINDEX_5_YEAR];
+            $threeYearBristindex = $row[self::BRISTINDEX_5_YEAR];
 
             $svarareFaRegion = null;
             if (is_numeric($row[self::SVARARE])) {
@@ -101,10 +101,10 @@ class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
                 // Copy from 0 fa region
                 if ($faRegion !== null) {
                     $parentOneYear = $yrkesgrupp->bristindex()->riket()->ettAr()->first();
-                    $parentFiveYear = $yrkesgrupp->bristindex()->riket()->femAr()->first();
+                    $parentThreeYear = $yrkesgrupp->bristindex()->riket()->treAr()->first();
 
                     $oneYearBristindex = $parentOneYear->bristindex;
-                    $fiveYearBristindex = $parentFiveYear->bristindex;
+                    $threeYearBristindex = $parentThreeYear->bristindex;
 
                     $meta = array_merge($meta, [
                         'yrkesverksamma' => $parentOneYear->meta['yrkesverksamma'],
@@ -130,14 +130,14 @@ class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
                     $oneYearBristindex
                 );
 
-                $fiveYear = self::makeYear(
+                $threeYear = self::makeYear(
                     $bristindexInsert,
                     3,
                     '2026',
-                    $fiveYearBristindex
+                    $threeYearBristindex
                 );
 
-                Bristindex::insert([$oneYear, $fiveYear]);
+                Bristindex::insert([$oneYear, $threeYear]);
             }
         }
     }
