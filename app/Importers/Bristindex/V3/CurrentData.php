@@ -126,7 +126,7 @@ class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
                 $oneYear = self::makeYear(
                     $bristindexInsert,
                     1,
-                    '2022',
+                    '2023',
                     $oneYearBristindex
                 );
 
