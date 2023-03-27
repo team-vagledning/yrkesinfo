@@ -149,7 +149,7 @@ class Yrkesomrade extends Model
 
         if (count($treAr)) {
             $res[] = [
-                'omfang' => 5,
+                'omfang' => 3,
                 'varde' => (float) $treAr->countBy('bristindex')->sort()->keys()->last(),
                 'artal' => $treAr->first()->artal,
                 'antalPrognoser' => $treAr->count(),
