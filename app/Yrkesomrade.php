@@ -98,7 +98,7 @@ class Yrkesomrade extends Model
         $forklarandeEttAr = "Utifrån {$ettAr->count()} yrkesprognoser så har {$commonEttAr['count']} st {$ettArTextToLower}";
 
         $res = [
-            'fem_ar' => [
+            'tre_ar' => [
                 'varde' => $treArValue,
                 'konkurrensVarde' => $treArValueInverted,
                 'text' => $commonTreAr['text'],
