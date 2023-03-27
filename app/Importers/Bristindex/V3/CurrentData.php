@@ -132,7 +132,7 @@ class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
 
                 $fiveYear = self::makeYear(
                     $bristindexInsert,
-                    5,
+                    3,
                     '2026',
                     $fiveYearBristindex
                 );
