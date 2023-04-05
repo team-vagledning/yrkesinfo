@@ -10,7 +10,7 @@ use App\Yrkesgrupp;
 
 class YrkesgruppAggregator extends BaseAggregator
 {
-    const YEAR = '2019';
+    const YEAR = '2021';
 
     private $jobSearchApi;
 
