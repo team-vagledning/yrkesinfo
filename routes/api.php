@@ -36,6 +36,8 @@ Route::namespace('Api\V1')->prefix('v1')->group(function () {
     Route::get('yrkesbenamningar', 'YrkesbenamningarController@index');
     Route::get('yrkesbenamningar/search', 'YrkesbenamningarController@search');
 
+    Route::get('yrkessok', 'YrkessokController@search');
+
     Route::get('regioner', 'RegionerController@index');
     Route::get('fa-regioner', 'FaRegionerController@index');
     Route::get('kommuner', 'KommunerController@index');

@@ -8,10 +8,10 @@ use App\Yrkesgrupp;
 
 class YrkesgruppService
 {
-    public function searchBySimilarity($term)
+    public function searchBySimilarity($term, $similarity = 0.3)
     {
-        $yrkesgrupper = Yrkesgrupp::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
-        $yrkesbenamningar = Yrkesbenamning::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
+        $yrkesgrupper = Yrkesgrupp::getByNameSimilarity($term, $similarity)->sortByDesc('similarity')->values()->all();
+        $yrkesbenamningar = Yrkesbenamning::getByNameSimilarity($term, $similarity)->sortByDesc('similarity')->values()->all();
         $sortedYrkesgrupper = [];
 
         foreach ($yrkesbenamningar as $yrkesbenamning) {
