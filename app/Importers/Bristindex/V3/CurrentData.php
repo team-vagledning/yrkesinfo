@@ -7,10 +7,11 @@ use App\BristindexGrouping;
 use App\FaRegion;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
+class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings, WithChunkReading
 {
     public const CONCEPT_ID = 0;
     public const FA_REGION = 1;
@@ -41,6 +42,11 @@ class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
         ];
     }
 
+    public function chunkSize(): int
+    {
+        return 200;
+    }
+
     public function startRow(): int
     {
         return 2;
@@ -48,9 +54,6 @@ class CurrentData implements ToCollection, WithStartRow, WithCustomCsvSettings
 
     public function collection(Collection $collection)
     {
-        // Clear bristindex, we don't care as Analysteamet can't deliver
-        Bristindex::truncate();
-
         foreach ($collection as $row) {
             $faRegion = null;
             if ($row[self::FA_REGION] > 0) {

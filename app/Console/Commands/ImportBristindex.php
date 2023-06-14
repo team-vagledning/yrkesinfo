@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Bristindex;
 use App\Importers\Bristindex\V2\ApiImporter;
 use App\Importers\Bristindex\V3\CurrentData;
 use App\Importers\Bristindex\V3\HistoricData;
@@ -42,7 +43,8 @@ class ImportBristindex extends Command
      */
     public function handle()
     {
-        // Actual
+        // Actual, clear first
+        Bristindex::truncate();
         Excel::import(
             new CurrentData,
             storage_path('imports/bristindex/v3/bedomning.csv'),
