@@ -35,7 +35,7 @@ class YrkeseditorYrke extends Model
             'similarity' => $similarity
         ]));
 
-        // Inject similarity into the results, could possible be made with a sql query
+        // Inject similarity into the results, could possibly be made with a sql query
         $yrkeseditorYrke = self::whereIn('id', $ids->pluck('id'))->with($with)->get()->each(function ($yrkeseditorYrke) use ($ids) {
             // Sort and get the biggest similarity by id
             $similarity = (float) $ids->sortBy('similarity')->keyBy('id')[$yrkeseditorYrke->id]->similarity;
@@ -43,5 +43,14 @@ class YrkeseditorYrke extends Model
         });
 
         return $yrkeseditorYrke;
+    }
+
+    public static function getByFormagor($term)
+    {
+        return self::whereExists(function ($query) use ($term) {
+            $query->select(DB::raw(1))
+                ->from(DB::raw("jsonb_array_elements(data->'formagor'->'detaljer') AS detalj"))
+                ->whereRaw("detalj->>'kategori' = ?", [ucfirst($term)]);
+        })->get();
     }
 }

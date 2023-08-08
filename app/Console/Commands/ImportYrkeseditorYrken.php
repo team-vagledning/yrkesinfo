@@ -39,5 +39,6 @@ class ImportYrkeseditorYrken extends Command
     public function handle()
     {
         app(YrkeseditorYrkenImporter::class)->run();
+        cache()->tags(['yrkessok'])->flush();
     }
 }

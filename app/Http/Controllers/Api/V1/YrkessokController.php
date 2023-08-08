@@ -7,6 +7,8 @@ use App\Http\Resources\YrkeseditorYrke as YrkeseditorYrkeResource;
 use App\Services\YrkesgruppService;
 use App\YrkeseditorYrke;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class YrkessokController extends Controller
 {
@@ -20,23 +22,35 @@ class YrkessokController extends Controller
         // Set a max length for the search term
         $term = substr($term, 0, 50);
 
-        $yrkesgrupper = app(YrkesgruppService::class)->searchBySimilarity($term, 0.4);
-        $yrkeseditorYrken = app(YrkeseditorYrke::class)->getByNameSimilarity($term, 0.4);
-
-        foreach ($yrkesgrupper as $yrke) {
-            $yrkeseditorYrkenBySsyk = app(YrkeseditorYrke::class)->whereSsyk($yrke->ssyk)->get();
-
-            foreach ($yrkeseditorYrkenBySsyk as $yrkeBySsyk) {
-                $yrkeBySsyk->similarity = $yrke->similarity;
-                $yrkeBySsyk->fromTaxonomy = true;
-
-                if ($yrkeseditorYrken->where('id', $yrkeBySsyk->id)->isEmpty()) {
-                    $yrkeseditorYrken->push($yrkeBySsyk);
-                }
-            }
+        $cacheKey = "yrkessok.search." . md5($term);
+        if (Cache::tags(['yrkessok'])->has($cacheKey) && ! $request->has('clearCache')) {
+            return Cache::tags(['yrkessok'])->get($cacheKey);
         }
 
-        $yrkeseditorYrken = $yrkeseditorYrken->sortByDesc('similarity')->values();
+        if (Str::startsWith($term, "f:")) {
+            $yrkeseditorYrken = app(YrkeseditorYrke::class)->getByFormagor(substr($term, 2));
+        } else {
+            $yrkesgrupper = app(YrkesgruppService::class)->searchBySimilarity($term, 0.4);
+            $yrkeseditorYrken = app(YrkeseditorYrke::class)->getByNameSimilarity($term, 0.4);
+
+            foreach ($yrkesgrupper as $yrke) {
+                $yrkeseditorYrkenBySsyk = app(YrkeseditorYrke::class)->whereSsyk($yrke->ssyk)->get();
+
+                foreach ($yrkeseditorYrkenBySsyk as $yrkeBySsyk) {
+                    $yrkeBySsyk->similarity = $yrke->similarity;
+                    $yrkeBySsyk->fromTaxonomy = true;
+
+                    if ($yrkeseditorYrken->where('id', $yrkeBySsyk->id)->isEmpty()) {
+                        $yrkeseditorYrken->push($yrkeBySsyk);
+                    }
+                }
+            }
+
+            $yrkeseditorYrken = $yrkeseditorYrken->sortByDesc('similarity')->values();
+        }
+
+
+        Cache::tags(['yrkessok'])->put($cacheKey, $yrkeseditorYrken, now()->addDays(30));
 
         return YrkeseditorYrkeResource::collection($yrkeseditorYrken);
     }
