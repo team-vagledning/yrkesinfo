@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Collections\Formagor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -47,6 +48,17 @@ class YrkeseditorYrke extends Model
 
     public static function getByFormagor($term)
     {
+        if (is_numeric($term)) {
+            $formagor = new Formagor();
+            $formaga = $formagor->firstWhere('id', $term);
+
+            if (array_key_exists('name', $formaga)) {
+                $term = $formaga['name'];
+            } else {
+                return null;
+            }
+        }
+        
         return self::whereExists(function ($query) use ($term) {
             $query->select(DB::raw(1))
                 ->from(DB::raw("jsonb_array_elements(data->'formagor'->'detaljer') AS detalj"))
