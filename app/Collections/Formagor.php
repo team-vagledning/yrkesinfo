@@ -2,10 +2,14 @@
 
 namespace App\Collections;
 
+use App\YrkeseditorYrke;
 use Illuminate\Database\Eloquent\Collection;
 
 class Formagor extends Collection
 {
+    protected static $cacheTag = 'yrkessok';
+    protected static $cacheKey = 'formagor';
+
     protected static $data = [
         [
             'id' => 1,
@@ -227,6 +231,18 @@ class Formagor extends Collection
 
     public function __construct($items = [])
     {
-        parent::__construct(static::$data);
+        if (cache()->tags([self::$cacheTag])->has(self::$cacheKey)) {
+            $data = cache()->tags([self::$cacheTag])->get(self::$cacheKey);
+        } else {
+            $data = empty($items) ? static::$data : $items;
+
+            foreach ($data as $key => $item) {
+                $data[$key]['antal_yrken'] = YrkeseditorYrke::getByFormagor($item['name'])->count();
+            }
+
+            cache()->tags([self::$cacheTag])->put(self::$cacheKey, $data);
+        }
+
+        parent::__construct($data);
     }
 }
