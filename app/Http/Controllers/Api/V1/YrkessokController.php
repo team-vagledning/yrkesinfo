@@ -49,9 +49,10 @@ class YrkessokController extends Controller
             $yrkeseditorYrken = $yrkeseditorYrken->sortByDesc('similarity')->values();
         }
 
+        $yrken = YrkeseditorYrkeResource::collection($yrkeseditorYrken);
 
-        Cache::tags(['yrkessok'])->put($cacheKey, $yrkeseditorYrken, now()->addDays(30));
+        Cache::tags(['yrkessok'])->put($cacheKey, $yrken, now()->addDays(30));
 
-        return YrkeseditorYrkeResource::collection($yrkeseditorYrken);
+        return $yrken;
     }
 }
