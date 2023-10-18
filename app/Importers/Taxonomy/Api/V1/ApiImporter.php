@@ -134,8 +134,8 @@ class ApiImporter implements ImporterInterface
                 return true;
             }
 
-            Region::updateOrCreate(['name' => $region->{'taxonomy/preferred-label'}], [
-                'taxonomy_id' => $region->{'taxonomy/id'},
+            Region::updateOrCreate(['external_id' => $region->{'taxonomy/id'}], [
+                'external_id' => $region->{'taxonomy/id'},
                 'name' => $region->{'taxonomy/preferred-label'},
             ]);
         });
@@ -205,7 +205,7 @@ class ApiImporter implements ImporterInterface
 
             // Sync yrkesgrupp to yrkesområde, and also yrkesbenämningar
             $yrkesgrupp->yrkesomraden()->syncWithoutDetaching($yrkesomraden->pluck('id'));
-            $yrkesgrupp->yrkesbenamningar()->syncWithoutDetaching($yrkesbenamingar->pluck('id')->whereNotNull());
+            $yrkesgrupp->yrkesbenamningar()->syncWithoutDetaching($yrkesbenamingar->pluck('id'));
         });
 
         return $this;
