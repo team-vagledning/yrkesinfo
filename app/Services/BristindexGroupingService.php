@@ -10,9 +10,9 @@ class BristindexGroupingService
 {
     public function searchBySimilarity($term)
     {
-        $bristindexGroupings = BristindexGrouping::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
-        $yrkesgrupper = Yrkesgrupp::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
-        $yrkesbenamningar = Yrkesbenamning::getByNameSimilarity($term)->sortByDesc('similarity')->values()->all();
+        $bristindexGroupings = BristindexGrouping::getByNameSimilarity($term, 0.4)->sortByDesc('similarity')->values()->all();
+        $yrkesgrupper = Yrkesgrupp::getByNameSimilarity($term, 0.4)->sortByDesc('similarity')->values()->all();
+        $yrkesbenamningar = Yrkesbenamning::getByNameSimilarity($term, 0.4)->sortByDesc('similarity')->values()->all();
         $sortedYrkesgrupper = [];
         $sortedBristindexGroupings = [];
 
