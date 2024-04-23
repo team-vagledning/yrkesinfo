@@ -17,6 +17,7 @@ class Yrkesgrupp extends JsonResource
     {
         return [
             'id' => $this->id,
+            'external_id' => $this->external_id,
             'yrkesomrade_id' => $this->yrkesomraden()->first()->id,
             'ssyk' => $this->ssyk,
             'yrkesprognoser' => Yrkesprognos::collection($this->yrkesprognoser ?? $this->getYrkesprognoser()),
