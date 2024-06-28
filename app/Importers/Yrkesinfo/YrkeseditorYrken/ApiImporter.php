@@ -22,6 +22,9 @@ class ApiImporter implements ImporterInterface
 
     public function run()
     {
+        // Get yrken already in db
+        $inDB = YrkeseditorYrke::get();
+
         // Fetch everything
         $results = $this->client->get('yrken');
 
@@ -33,6 +36,13 @@ class ApiImporter implements ImporterInterface
             ], [
                 'data' => $yrke
             ]);
+        }
+
+        foreach ($inDB as $dbYrke) {
+            if (!in_array($dbYrke->id, array_column($yrkeseditorYrken, 'id'), true)) {
+                echo "Removing yrke with id {$dbYrke->id}\n";
+                $dbYrke->delete();
+            }
         }
     }
 }
